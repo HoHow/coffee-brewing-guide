@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>咖啡沖煮參數指南</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1 class="logo">☕ 咖啡沖煮指南</h1>
+            <nav class="nav">
+                <a href="#calculator" class="nav-link active" data-section="calculator">參數計算</a>
+                <a href="#recipes" class="nav-link" data-section="recipes">配方庫</a>
+                <a href="#journal" class="nav-link" data-section="journal">沖煮日誌</a>
+                <a href="#guide" class="nav-link" data-section="guide">沖煮指南</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main">
+        <!-- 參數計算器區塊 -->
+        <section id="calculator" class="section active">
+            <div class="container">
+                <h2 class="section-title">沖煮參數計算器</h2>
+
+                <!-- 主要操作區：沖煮方式 + 建議參數 + 輸入 -->
+                <div class="card main-brew-card">
+                    <!-- 第一排：沖煮方式選擇 -->
+                    <div class="brew-row">
+                        <div class="method-selector-compact">
+                            <label class="input-label">沖煮方式</label>
+                            <select id="brewMethodSelect" class="method-select">
+                                <optgroup label="🫖 手沖濾杯">
+                                    <option value="v60" selected>V60</option>
+                                    <option value="kalita">Kalita Wave</option>
+                                    <option value="chemex">Chemex</option>
+                                    <option value="origami">摺紙濾杯</option>
+                                    <option value="nel">法蘭絨</option>
+                                </optgroup>
+                                <optgroup label="🍶 浸泡萃取">
+                                    <option value="clever">聰明濾杯</option>
+                                    <option value="frenchpress">法壓壺</option>
+                                    <option value="siphon">虹吸壺</option>
+                                    <option value="turkish">土耳其咖啡</option>
+                                </optgroup>
+                                <optgroup label="💨 加壓萃取">
+                                    <option value="espresso">義式濃縮</option>
+                                    <option value="moka">摩卡壺</option>
+                                    <option value="aeropress">愛樂壓</option>
+                                    <option value="phin">越南滴漏</option>
+                                </optgroup>
+                                <optgroup label="🤖 機器沖煮">
+                                    <option value="dripmachine">美式滴漏機</option>
+                                </optgroup>
+                                <optgroup label="🧊 冷萃咖啡">
+                                    <option value="coldbrew">冷萃</option>
+                                    <option value="icedrip">冰滴</option>
+                                </optgroup>
+                            </select>
+                        </div>
+                        <div class="method-desc-compact">
+                            <span class="method-info-icon" id="methodIcon">🫖</span>
+                            <span id="methodDescription" class="method-desc-text">錐形濾杯，流速快，能突顯咖啡明亮的風味</span>
+                        </div>
+                    </div>
+
+                    <!-- 建議參數：橫向顯示 -->
+                    <div class="recommend-bar">
+                        <div class="recommend-item">
+                            <span class="recommend-icon">🌡️</span>
+                            <div class="recommend-content">
+                                <span class="recommend-label">水溫</span>
+                                <span id="tempRecommend" class="recommend-value">92°C</span>
+                            </div>
+                        </div>
+                        <div class="recommend-item">
+                            <span class="recommend-icon">⚙️</span>
+                            <div class="recommend-content">
+                                <span class="recommend-label">研磨度</span>
+                                <span id="grindRecommend" class="recommend-value">中細</span>
+                            </div>
+                        </div>
+                        <div class="recommend-item">
+                            <span class="recommend-icon">⏱️</span>
+                            <div class="recommend-content">
+                                <span class="recommend-label">時間</span>
+                                <span id="timeRecommend" class="recommend-value">2:30-3:00</span>
+                            </div>
+                        </div>
+                        <div class="recommend-item">
+                            <span class="recommend-icon">💧</span>
+                            <div class="recommend-content">
+                                <span class="recommend-label">悶蒸</span>
+                                <span id="bloomRecommend" class="recommend-value">30 ml</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 分隔線 -->
+                    <hr class="section-divider">
+
+                    <!-- 參數輸入區 -->
+                    <div class="params-input-section">
+                        <div class="params-row">
+                            <div class="param-input-group">
+                                <label class="input-label">咖啡粉</label>
+                                <div class="input-with-unit">
+                                    <input type="number" id="coffeeAmount" value="15" min="1" max="100">
+                                    <span class="unit">g</span>
+                                </div>
+                            </div>
+                            <div class="param-input-group">
+                                <label class="input-label">水量</label>
+                                <div class="input-with-unit">
+                                    <input type="number" id="waterAmount" value="250" min="10" max="2000">
+                                    <span class="unit">ml</span>
+                                </div>
+                                <small class="recommend-hint">建議: <span id="recommendedWater">225-255</span> ml</small>
+                            </div>
+                            <div class="param-input-group ratio-display-group">
+                                <label class="input-label">水粉比</label>
+                                <div class="ratio-big" id="ratioDisplay">1:16.7</div>
+                            </div>
+                        </div>
+
+                        <!-- 比例滑桿 -->
+                        <div class="ratio-slider-section">
+                            <input type="range" id="ratioSlider" min="10" max="20" step="0.1" value="16.7">
+                            <div class="ratio-labels">
+                                <span>濃 1:10</span>
+                                <span id="ratioValue">1:16.7</span>
+                                <span>淡 1:20</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 咖啡豆資訊 -->
+                <div class="card">
+                    <h3 class="card-title">咖啡豆資訊</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>烘焙度</label>
+                            <select id="roastLevel">
+                                <option value="light">淺焙 (Light)</option>
+                                <option value="medium-light">中淺焙 (Medium Light)</option>
+                                <option value="medium" selected>中焙 (Medium)</option>
+                                <option value="medium-dark">中深焙 (Medium Dark)</option>
+                                <option value="dark">深焙 (Dark)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>產地</label>
+                            <select id="origin">
+                                <optgroup label="非洲">
+                                    <option value="ethiopia-yirgacheffe">衣索比亞 耶加雪菲</option>
+                                    <option value="ethiopia-sidamo">衣索比亞 西達摩</option>
+                                    <option value="ethiopia-guji">衣索比亞 古吉</option>
+                                    <option value="ethiopia-harrar">衣索比亞 哈拉</option>
+                                    <option value="ethiopia-limu">衣索比亞 利姆</option>
+                                    <option value="ethiopia-jimma">衣索比亞 金瑪</option>
+                                    <option value="ethiopia-nekemte">衣索比亞 涅坎特</option>
+                                    <option value="kenya-aa">肯亞 AA</option>
+                                    <option value="kenya-ab">肯亞 AB</option>
+                                    <option value="rwanda">盧安達</option>
+                                    <option value="burundi">蒲隆地</option>
+                                    <option value="tanzania">坦尚尼亞</option>
+                                    <option value="congo">剛果</option>
+                                    <option value="malawi">馬拉威</option>
+                                    <option value="zambia">尚比亞</option>
+                                    <option value="uganda">烏干達</option>
+                                    <option value="cameroon">喀麥隆</option>
+                                    <option value="ivory-coast">象牙海岸</option>
+                                    <option value="togo">多哥</option>
+                                    <option value="zimbabwe">辛巴威</option>
+                                </optgroup>
+                                <optgroup label="中美洲">
+                                    <option value="guatemala-antigua">瓜地馬拉 安提瓜</option>
+                                    <option value="guatemala-huehue">瓜地馬拉 薇薇特南果</option>
+                                    <option value="guatemala-acatenango">瓜地馬拉 阿卡特南果</option>
+                                    <option value="guatemala-coban">瓜地馬拉 科班</option>
+                                    <option value="costarica-tarrazu">哥斯大黎加 塔拉珠</option>
+                                    <option value="costarica-westvalley">哥斯大黎加 西部谷地</option>
+                                    <option value="panama-geisha">巴拿馬 藝伎</option>
+                                    <option value="panama-boquete">巴拿馬 波奎特</option>
+                                    <option value="honduras">宏都拉斯</option>
+                                    <option value="honduras-copan">宏都拉斯 科潘</option>
+                                    <option value="honduras-marcala">宏都拉斯 馬卡拉</option>
+                                    <option value="elsalvador">薩爾瓦多</option>
+                                    <option value="elsalvador-apaneca">薩爾瓦多 阿帕內卡</option>
+                                    <option value="nicaragua">尼加拉瓜</option>
+                                    <option value="mexico">墨西哥</option>
+                                    <option value="mexico-chiapas">墨西哥 恰帕斯</option>
+                                    <option value="mexico-oaxaca">墨西哥 瓦哈卡</option>
+                                    <option value="cuba">古巴</option>
+                                    <option value="dominican">多明尼加</option>
+                                    <option value="haiti">海地</option>
+                                    <option value="puerto-rico">波多黎各</option>
+                                </optgroup>
+                                <optgroup label="南美洲">
+                                    <option value="colombia-huila">哥倫比亞 薇拉</option>
+                                    <option value="colombia-narino">哥倫比亞 娜玲瓏</option>
+                                    <option value="colombia-cauca">哥倫比亞 考卡</option>
+                                    <option value="colombia-santander">哥倫比亞 桑坦德</option>
+                                    <option value="colombia-tolima">哥倫比亞 托利馬</option>
+                                    <option value="brazil-santos">巴西 聖多斯</option>
+                                    <option value="brazil-mogiana">巴西 摩吉安納</option>
+                                    <option value="brazil-cerrado">巴西 乾原地區</option>
+                                    <option value="brazil-sul-minas">巴西 南米納斯</option>
+                                    <option value="peru">秘魯</option>
+                                    <option value="bolivia">玻利維亞</option>
+                                    <option value="ecuador">厄瓜多</option>
+                                    <option value="venezuela">委內瑞拉</option>
+                                    <option value="paraguay">巴拉圭</option>
+                                    <option value="argentina">阿根廷</option>
+                                </optgroup>
+                                <optgroup label="亞洲 / 太平洋">
+                                    <option value="indonesia-sumatra">印尼 蘇門答臘 曼特寧</option>
+                                    <option value="indonesia-java">印尼 爪哇</option>
+                                    <option value="indonesia-sulawesi">印尼 蘇拉維西</option>
+                                    <option value="indonesia-bali">印尼 峇里島</option>
+                                    <option value="indonesia-flores">印尼 弗洛勒斯</option>
+                                    <option value="indonesia-gayo">印尼 迦佑</option>
+                                    <option value="indonesia-lintong">印尼 林東</option>
+                                    <option value="vietnam">越南</option>
+                                    <option value="yemen">也門 摩卡</option>
+                                    <option value="india-malabar">印度 馬拉巴</option>
+                                    <option value="india-mysore">印度 邁索爾</option>
+                                    <option value="png">巴布亞紐幾內亞</option>
+                                    <option value="china-yunnan">中國 雲南</option>
+                                    <option value="china-hainan">中國 海南</option>
+                                    <option value="china-fujian">中國 福建</option>
+                                    <option value="taiwan-alishan">台灣 阿里山</option>
+                                    <option value="taiwan-nantou">台灣 南投</option>
+                                    <option value="taiwan-pingtung">台灣 屏東</option>
+                                    <option value="thailand">泰國</option>
+                                    <option value="thailand-chiangmai">泰國 清邁</option>
+                                    <option value="myanmar">緬甸</option>
+                                    <option value="laos">寮國</option>
+                                    <option value="philippines">菲律賓</option>
+                                    <option value="philippines-benguet">菲律賓 本格特</option>
+                                    <option value="timor-leste">東帝汶</option>
+                                    <option value="nepal">尼泊爾</option>
+                                    <option value="australia">澳洲</option>
+                                    <option value="hawaii-kona">夏威夷 乳納</option>
+                                    <option value="jamaica-bluemountain">牙買加 藍山</option>
+                                </optgroup>
+                                <optgroup label="綜合 / 其他">
+                                    <option value="blend-espresso">義式綜合豆</option>
+                                    <option value="blend-breakfast">早餐綜合豆</option>
+                                    <option value="blend-house">自家綜合豆</option>
+                                    <option value="decaf">低咖啡因豆</option>
+                                    <option value="other">其他</option>
+                                </optgroup>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>品種</label>
+                            <select id="variety">
+                                <optgroup label="經典阿拉比卡">
+                                    <option value="typica">鐵皮卡 Typica</option>
+                                    <option value="bourbon">波旁 Bourbon</option>
+                                    <option value="yellow-bourbon">黃波旁 Yellow Bourbon</option>
+                                    <option value="red-bourbon">紅波旁 Red Bourbon</option>
+                                    <option value="pink-bourbon">粉紅波旁 Pink Bourbon</option>
+                                    <option value="bourbon-pointu">波旁尖身 Bourbon Pointu</option>
+                                    <option value="caturra">卡杜拉 Caturra</option>
+                                    <option value="catuai">卡杜阿依 Catuai</option>
+                                    <option value="red-catuai">紅卡杜阿依 Red Catuai</option>
+                                    <option value="yellow-catuai">黃卡杜阿依 Yellow Catuai</option>
+                                    <option value="mundo-novo">新世界 Mundo Novo</option>
+                                </optgroup>
+                                <optgroup label="頂級稀有品種">
+                                    <option value="geisha">藝伎 Geisha</option>
+                                    <option value="pacamara">帕卡瑪拉 Pacamara</option>
+                                    <option value="maragogipe">象豆 Maragogipe</option>
+                                    <option value="maracaturra">馬拉卡杜拉 Maracaturra</option>
+                                    <option value="mokka">摩卡 Mokka</option>
+                                    <option value="laurina">蘿莉娜 Laurina</option>
+                                    <option value="eugenioides">尤金尼奧德斯 Eugenioides</option>
+                                    <option value="sidra">希德拉 Sidra</option>
+                                    <option value="wush-wush">烏許烏許 Wush Wush</option>
+                                    <option value="caturra-chiroso">卡杜拉奇羅索 Chiroso</option>
+                                </optgroup>
+                                <optgroup label="肯亞品種">
+                                    <option value="sl28">SL28</option>
+                                    <option value="sl34">SL34</option>
+                                    <option value="sl14">SL14</option>
+                                    <option value="k7">K7</option>
+                                    <option value="ruiru11">Ruiru 11</option>
+                                    <option value="batian">巴提安 Batian</option>
+                                </optgroup>
+                                <optgroup label="衣索比亞原生種">
+                                    <option value="heirloom">原生種 Heirloom</option>
+                                    <option value="ethiopian-74110">74110</option>
+                                    <option value="ethiopian-74158">74158</option>
+                                    <option value="ethiopian-74112">74112</option>
+                                </optgroup>
+                                <optgroup label="中美洲培育品種">
+                                    <option value="pacas">帕卡斯 Pacas</option>
+                                    <option value="villa-sarchi">薇拉莎奇 Villa Sarchi</option>
+                                    <option value="tekisic">特奇希克 Tekisic</option>
+                                </optgroup>
+                                <optgroup label="哥倫比亞品種">
+                                    <option value="castillo">卡斯提優 Castillo</option>
+                                    <option value="colombia-variety">哥倫比亞 Colombia</option>
+                                    <option value="tabi">塔比 Tabi</option>
+                                </optgroup>
+                                <optgroup label="宏都拉斯品種">
+                                    <option value="parainema">帕萊內瑪 Parainema</option>
+                                    <option value="lempira">藍皮拉 Lempira</option>
+                                    <option value="ihcafe90">IHCAFE 90</option>
+                                </optgroup>
+                                <optgroup label="盧安達品種">
+                                    <option value="jackson">傑克森 Jackson</option>
+                                    <option value="mibirizi">米比里茲 Mibirizi</option>
+                                </optgroup>
+                                <optgroup label="抗病混種">
+                                    <option value="catimor">卡提摩 Catimor</option>
+                                    <option value="sarchimor">薩奇摩 Sarchimor</option>
+                                    <option value="marsellesa">馬塞列薩 Marsellesa</option>
+                                    <option value="f1-hybrid">F1混種 F1 Hybrid</option>
+                                    <option value="centroamericano">中美洲混種 Centroamericano</option>
+                                </optgroup>
+                                <optgroup label="巴西品種">
+                                    <option value="obata">歐巴塔 Obata</option>
+                                    <option value="icatu">伊卡圖 Icatu</option>
+                                    <option value="acaia">阿卡亞 Acaia</option>
+                                </optgroup>
+                                <optgroup label="印度品種">
+                                    <option value="kent">肯特 Kent</option>
+                                    <option value="s795">S795</option>
+                                </optgroup>
+                                <optgroup label="其他品種">
+                                    <option value="java">爪哇 Java</option>
+                                    <option value="aramosa">阿拉摩莎 Aramosa</option>
+                                    <option value="robusta">羅布斯塔 Robusta</option>
+                                    <option value="liberica">賴比瑞亞 Liberica</option>
+                                    <option value="blend">混合品種</option>
+                                    <option value="unknown">未知 / 其他</option>
+                                </optgroup>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>處理法</label>
+                            <select id="process">
+                                <optgroup label="傳統處理法">
+                                    <option value="washed">水洗 Washed</option>
+                                    <option value="natural">日曬 Natural</option>
+                                    <option value="honey-yellow">黃蜜 Yellow Honey</option>
+                                    <option value="honey-red">紅蜜 Red Honey</option>
+                                    <option value="honey-black">黑蜜 Black Honey</option>
+                                    <option value="wet-hulled">濕剝法 Wet Hulled</option>
+                                    <option value="semi-washed">半水洗 Semi-Washed</option>
+                                </optgroup>
+                                <optgroup label="特殊處理法">
+                                    <option value="anaerobic">厭氧發酵 Anaerobic</option>
+                                    <option value="carbonic">二氧化碳浸漬 Carbonic</option>
+                                    <option value="double-ferment">雙重發酵 Double Fermentation</option>
+                                    <option value="lactic">乳酸發酵 Lactic</option>
+                                    <option value="wine">酒桶發酵 Wine Process</option>
+                                    <option value="koji">麴菌處理 Koji</option>
+                                    <option value="thermal-shock">熱衝擊 Thermal Shock</option>
+                                </optgroup>
+                                <optgroup label="其他">
+                                    <option value="monsooned">風漬 Monsooned</option>
+                                    <option value="decaf-swiss">瑞士水處理低咖啡因</option>
+                                    <option value="decaf-co2">二氧化碳低咖啡因</option>
+                                    <option value="unknown">未知 / 其他</option>
+                                </optgroup>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- 咖啡豆風味提示 -->
+                    <div id="beanFlavorHint" class="bean-flavor-hint">
+                        <span class="hint-icon">💡</span>
+                        <span id="beanHintText">選擇咖啡豆資訊以獲得風味提示</span>
+                    </div>
+                </div>
+
+                <!-- 風味預測 -->
+                <div class="card flavor-prediction">
+                    <h3 class="card-title">風味預測</h3>
+
+                    <!-- 風味指標 -->
+                    <div class="flavor-meters">
+                        <div class="flavor-meter">
+                            <span class="meter-label">濃度</span>
+                            <div class="meter-bar">
+                                <div id="strengthMeter" class="meter-fill" style="width: 50%"></div>
+                            </div>
+                            <span class="meter-range"><span>淡</span><span>濃</span></span>
+                        </div>
+                        <div class="flavor-meter">
+                            <span class="meter-label">酸質</span>
+                            <div class="meter-bar">
+                                <div id="acidityMeter" class="meter-fill acidity" style="width: 50%"></div>
+                            </div>
+                            <span class="meter-range"><span>低</span><span>高</span></span>
+                        </div>
+                        <div class="flavor-meter">
+                            <span class="meter-label">苦味</span>
+                            <div class="meter-bar">
+                                <div id="bitterMeter" class="meter-fill bitter" style="width: 50%"></div>
+                            </div>
+                            <span class="meter-range"><span>低</span><span>高</span></span>
+                        </div>
+                        <div class="flavor-meter">
+                            <span class="meter-label">甜感</span>
+                            <div class="meter-bar">
+                                <div id="sweetMeter" class="meter-fill sweet" style="width: 50%"></div>
+                            </div>
+                            <span class="meter-range"><span>低</span><span>高</span></span>
+                        </div>
+                        <div class="flavor-meter">
+                            <span class="meter-label">醇厚度</span>
+                            <div class="meter-bar">
+                                <div id="bodyMeter" class="meter-fill body" style="width: 50%"></div>
+                            </div>
+                            <span class="meter-range"><span>輕盈</span><span>厚實</span></span>
+                        </div>
+                    </div>
+
+                    <!-- 風味描述 -->
+                    <div class="flavor-description">
+                        <h4>預期風味特性</h4>
+                        <p id="flavorText">平衡的風味，適中的酸質與醇厚度，適合日常飲用。</p>
+                    </div>
+
+                    <!-- 風味標籤 -->
+                    <div class="flavor-tags">
+                        <span class="flavor-tag" id="ratioTag">標準比例</span>
+                        <span class="flavor-tag" id="tempTag">中等萃取</span>
+                        <span class="flavor-tag" id="roastTag">平衡風味</span>
+                    </div>
+                </div>
+
+                <!-- 參數調整建議 -->
+                <div class="card tips-card">
+                    <h3 class="card-title">調整建議</h3>
+                    <div id="adjustmentTips" class="tips-list">
+                        <div class="tip-item">
+                            <span class="tip-icon">💡</span>
+                            <span class="tip-text">目前參數均衡，適合大多數咖啡豆</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 快速儲存配方 -->
+                <div class="card">
+                    <button id="saveRecipeBtn" class="btn btn-primary btn-full">💾 儲存此配方</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 配方庫區塊 -->
+        <section id="recipes" class="section">
+            <div class="container">
+                <h2 class="section-title">沖煮配方庫</h2>
+
+                <!-- 搜尋和篩選 -->
+                <div class="card">
+                    <div class="recipe-filters">
+                        <input type="text" id="recipeSearch" placeholder="搜尋配方名稱或產地...">
+                        <select id="filterMethod">
+                            <option value="">全部沖煮方式</option>
+                            <option value="v60">V60</option>
+                            <option value="kalita">Kalita</option>
+                            <option value="chemex">Chemex</option>
+                            <option value="origami">摺紙濾杯</option>
+                            <option value="clever">聰明濾杯</option>
+                            <option value="frenchpress">法壓壺</option>
+                            <option value="aeropress">愛樂壓</option>
+                            <option value="siphon">虹吸壺</option>
+                            <option value="nel">法蘭絨</option>
+                            <option value="moka">摩卡壺</option>
+                            <option value="espresso">義式濃縮</option>
+                            <option value="phin">越南滴漏</option>
+                            <option value="turkish">土耳其咖啡</option>
+                            <option value="dripmachine">美式滴漏機</option>
+                            <option value="coldbrew">冷萃</option>
+                            <option value="icedrip">冰滴</option>
+                        </select>
+                        <select id="filterOrigin">
+                            <option value="">全部產地</option>
+                            <option value="衣索比亞">衣索比亞</option>
+                            <option value="肯亞">肯亞</option>
+                            <option value="哥倫比亞">哥倫比亞</option>
+                            <option value="巴西">巴西</option>
+                            <option value="瓜地馬拉">瓜地馬拉</option>
+                            <option value="印尼">印尼</option>
+                            <option value="巴拿馬">巴拿馬</option>
+                            <option value="哥斯大黎加">哥斯大黎加</option>
+                            <option value="也門">也門</option>
+                            <option value="盧安達">盧安達</option>
+                        </select>
+                        <select id="filterRoast">
+                            <option value="">全部烘焙度</option>
+                            <option value="light">淺焙</option>
+                            <option value="medium">中焙</option>
+                            <option value="dark">深焙</option>
+                        </select>
+                    </div>
+                    <p id="recipeCount" class="recipe-count"></p>
+                </div>
+
+                <!-- 預設配方 -->
+                <div class="card">
+                    <h3 class="card-title">經典配方</h3>
+                    <div id="defaultRecipes" class="recipe-list">
+                        <!-- 由 JS 動態生成 -->
+                    </div>
+                </div>
+
+                <!-- 我的配方 -->
+                <div class="card">
+                    <h3 class="card-title">我的配方</h3>
+                    <div id="myRecipes" class="recipe-list">
+                        <p class="empty-message">尚未儲存任何配方</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 沖煮日誌區塊 -->
+        <section id="journal" class="section">
+            <div class="container">
+                <h2 class="section-title">沖煮日誌</h2>
+
+                <!-- 新增日誌 -->
+                <div class="card">
+                    <h3 class="card-title">記錄今天的沖煮</h3>
+                    <form id="journalForm">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>日期</label>
+                                <input type="date" id="journalDate" required>
+                            </div>
+                            <div class="form-group">
+                                <label>沖煮方式</label>
+                                <select id="journalMethod" required>
+                                    <option value="v60">V60</option>
+                                    <option value="kalita">Kalita</option>
+                                    <option value="chemex">Chemex</option>
+                                    <option value="origami">摺紙濾杯</option>
+                                    <option value="clever">聰明濾杯</option>
+                                    <option value="frenchpress">法壓壺</option>
+                                    <option value="aeropress">愛樂壓</option>
+                                    <option value="siphon">虹吸壺</option>
+                                    <option value="nel">法蘭絨</option>
+                                    <option value="moka">摩卡壺</option>
+                                    <option value="espresso">義式濃縮</option>
+                                    <option value="phin">越南滴漏</option>
+                                    <option value="turkish">土耳其咖啡</option>
+                                    <option value="dripmachine">美式滴漏機</option>
+                                    <option value="coldbrew">冷萃</option>
+                                    <option value="icedrip">冰滴</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>咖啡豆</label>
+                                <input type="text" id="journalBean" placeholder="例：衣索比亞 耶加雪菲">
+                            </div>
+                            <div class="form-group">
+                                <label>咖啡粉量 (g)</label>
+                                <input type="number" id="journalCoffee" value="15">
+                            </div>
+                            <div class="form-group">
+                                <label>水量 (ml)</label>
+                                <input type="number" id="journalWater" value="250">
+                            </div>
+                            <div class="form-group">
+                                <label>水溫 (°C)</label>
+                                <input type="number" id="journalTemp" value="92">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>風味評分</label>
+                            <div class="rating-input" id="ratingInput">
+                                <span class="star" data-rating="1">☆</span>
+                                <span class="star" data-rating="2">☆</span>
+                                <span class="star" data-rating="3">☆</span>
+                                <span class="star" data-rating="4">☆</span>
+                                <span class="star" data-rating="5">☆</span>
+                            </div>
+                            <input type="hidden" id="journalRating" value="0">
+                        </div>
+
+                        <div class="form-group">
+                            <label>風味筆記</label>
+                            <textarea id="journalNotes" rows="3" placeholder="描述這杯咖啡的風味..."></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-full">📝 記錄沖煮</button>
+                    </form>
+                </div>
+
+                <!-- 歷史記錄 -->
+                <div class="card">
+                    <h3 class="card-title">歷史記錄</h3>
+                    <div id="journalEntries" class="journal-list">
+                        <p class="empty-message">尚未有任何記錄</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 沖煮指南區塊 -->
+        <section id="guide" class="section">
+            <div class="container">
+                <h2 class="section-title">互動式沖煮指南</h2>
+
+                <!-- 選擇沖煮方式 -->
+                <div id="guideSelector" class="card">
+                    <h3 class="card-title">選擇沖煮方式開始學習</h3>
+                    <div class="guide-category">
+                        <h4 class="guide-category-title">手沖濾杯</h4>
+                        <div class="guide-methods">
+                            <button class="guide-method-btn" data-guide="v60">V60 手沖</button>
+                            <button class="guide-method-btn" data-guide="kalita">Kalita 蛋糕杯</button>
+                            <button class="guide-method-btn" data-guide="chemex">Chemex</button>
+                            <button class="guide-method-btn" data-guide="origami">摺紙濾杯</button>
+                            <button class="guide-method-btn" data-guide="nel">法蘭絨</button>
+                        </div>
+                    </div>
+                    <div class="guide-category">
+                        <h4 class="guide-category-title">浸泡萃取</h4>
+                        <div class="guide-methods">
+                            <button class="guide-method-btn" data-guide="clever">聰明濾杯</button>
+                            <button class="guide-method-btn" data-guide="frenchpress">法壓壺</button>
+                            <button class="guide-method-btn" data-guide="siphon">虹吸壺</button>
+                            <button class="guide-method-btn" data-guide="phin">越南滴漏</button>
+                            <button class="guide-method-btn" data-guide="turkish">土耳其咖啡</button>
+                        </div>
+                    </div>
+                    <div class="guide-category">
+                        <h4 class="guide-category-title">加壓萃取</h4>
+                        <div class="guide-methods">
+                            <button class="guide-method-btn" data-guide="aeropress">愛樂壓</button>
+                            <button class="guide-method-btn" data-guide="moka">摩卡壺</button>
+                            <button class="guide-method-btn" data-guide="espresso">義式濃縮</button>
+                        </div>
+                    </div>
+                    <div class="guide-category">
+                        <h4 class="guide-category-title">冷萃咖啡</h4>
+                        <div class="guide-methods">
+                            <button class="guide-method-btn" data-guide="coldbrew">冷萃壺</button>
+                            <button class="guide-method-btn" data-guide="icedrip">冰滴壺</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 步驟指南 -->
+                <div id="guideContent" class="card" style="display: none;">
+                    <button id="guideBackBtn" class="guide-back-btn">← 返回選擇其他沖煮方式</button>
+                    <h3 class="card-title" id="guideTitle">V60 沖煮步驟</h3>
+
+                    <!-- 介紹 -->
+                    <div id="guideIntro" class="guide-intro"></div>
+
+                    <!-- 器材清單 -->
+                    <div id="guideEquipment" class="guide-equipment"></div>
+
+                    <!-- 建議參數 -->
+                    <div id="guideParams" class="guide-params"></div>
+
+                    <!-- 步驟 -->
+                    <div id="guideSteps" class="guide-steps">
+                        <!-- 由 JS 動態生成 -->
+                    </div>
+
+                    <!-- 專家技巧 -->
+                    <div id="guideTips" class="guide-tips"></div>
+
+                    <!-- 常見問題排解 -->
+                    <div id="guideTroubleshooting" class="guide-troubleshooting"></div>
+
+                    <!-- 計時器 -->
+                    <div class="timer-section">
+                        <div class="timer-display">
+                            <span id="timerMinutes">00</span>:<span id="timerSeconds">00</span>
+                        </div>
+                        <div class="timer-controls">
+                            <button id="timerStart" class="btn btn-primary">▶ 開始</button>
+                            <button id="timerPause" class="btn btn-secondary">⏸ 暫停</button>
+                            <button id="timerReset" class="btn btn-secondary">🔄 重置</button>
+                        </div>
+                    </div>
+
+                    <!-- 當前步驟提示 -->
+                    <div id="currentStepAlert" class="step-alert" style="display: none;">
+                        <span class="alert-icon">🔔</span>
+                        <span id="stepAlertText">準備開始悶蒸</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 儲存配方彈窗 -->
+    <div id="saveRecipeModal" class="modal">
+        <div class="modal-content">
+            <h3>儲存配方</h3>
+            <form id="saveRecipeForm">
+                <div class="form-group">
+                    <label>配方名稱</label>
+                    <input type="text" id="recipeName" placeholder="例：我的晨間配方" required>
+                </div>
+                <div class="form-group">
+                    <label>備註</label>
+                    <textarea id="recipeNotes" rows="2" placeholder="任何想記錄的細節..."></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelSaveRecipe">取消</button>
+                    <button type="submit" class="btn btn-primary">儲存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast 通知 -->
+    <div id="toast" class="toast"></div>
+
+    <footer class="footer">
+        <div class="container">
+            <p>☕ 咖啡沖煮指南 | 讓每一杯都完美</p>
+        </div>
+    </footer>
+
+    <script src="js/data.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
