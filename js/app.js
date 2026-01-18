@@ -191,6 +191,7 @@ function init() {
     setTodayDate();
 
     // 初始化 Hero 和滾動動畫
+    initHeaderScroll();
     initHeroAnimations();
     initScrollAnimations();
     setupHeroCTA();
@@ -237,8 +238,17 @@ function saveToStorage() {
     localStorage.setItem('coffeeJournal', JSON.stringify(state.journalEntries));
 }
 
-// 設置事件監聽器
+// 設置事件監聯器
 function setupEventListeners() {
+    // Logo 點擊回首頁
+    const logoLink = document.querySelector('.logo a[data-section]');
+    if (logoLink) {
+        logoLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            switchSection('hero');
+        });
+    }
+
     // 導航切換
     elements.navLinks.forEach(link => {
         link.addEventListener('click', (e) => {
@@ -1431,6 +1441,20 @@ function showToast(message) {
 // ========================================
 // Hero Section 功能
 // ========================================
+
+// 初始化標題欄滾動效果
+function initHeaderScroll() {
+    const header = document.querySelector('.header');
+    if (!header) return;
+
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 50) {
+            header.classList.add('scrolled');
+        } else {
+            header.classList.remove('scrolled');
+        }
+    }, { passive: true });
+}
 
 // 初始化 Hero 載入動畫
 function initHeroAnimations() {
