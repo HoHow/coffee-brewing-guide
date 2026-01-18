@@ -57,6 +57,13 @@
     <!-- <link rel="icon" type="image/png" href="assets/favicon.png"> -->
     <!-- <link rel="apple-touch-icon" href="assets/apple-touch-icon.png"> -->
 
+    <!-- PWA 支援 -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#8B4513">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="brown">
+    <meta name="apple-mobile-web-app-title" content="咖啡指南">
+
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -65,10 +72,12 @@
             <h1 class="logo"><a href="#hero" data-section="hero">☕ 咖啡沖煮指南</a></h1>
             <nav class="nav">
                 <a href="#hero" class="nav-link active" data-section="hero">首頁</a>
-                <a href="#calculator" class="nav-link" data-section="calculator">參數計算</a>
+                <a href="#calculator" class="nav-link" data-section="calculator">計算器</a>
                 <a href="#recipes" class="nav-link" data-section="recipes">配方庫</a>
-                <a href="#journal" class="nav-link" data-section="journal">沖煮日誌</a>
-                <a href="#guide" class="nav-link" data-section="guide">沖煮指南</a>
+                <a href="#journal" class="nav-link" data-section="journal">日誌</a>
+                <a href="#flavorwheel" class="nav-link" data-section="flavorwheel">風味輪</a>
+                <a href="#tools" class="nav-link" data-section="tools">工具</a>
+                <a href="#guide" class="nav-link" data-section="guide">指南</a>
             </nav>
         </div>
     </header>
@@ -681,6 +690,170 @@
             </div>
         </section>
 
+        <!-- 風味輪區塊 -->
+        <section id="flavorwheel" class="section">
+            <div class="container">
+                <h2 class="section-title">互動式風味輪</h2>
+
+                <div class="card">
+                    <h3 class="card-title">探索咖啡風味世界</h3>
+                    <p class="card-description">點擊風味類別，深入了解每種風味的特徵與常見產區</p>
+
+                    <!-- 風味類別選擇 -->
+                    <div id="flavorCategoryList" class="flavor-category-list">
+                        <!-- 由 JS 動態生成 -->
+                    </div>
+
+                    <!-- 風味詳情面板 -->
+                    <div id="flavorDetailPanel" class="flavor-detail-panel" style="display: none;">
+                        <h4 id="flavorCategoryTitle" class="flavor-category-detail-title"></h4>
+                        <p id="flavorCategoryDesc" class="flavor-category-desc"></p>
+                        <div id="flavorSubcategories">
+                            <!-- 由 JS 動態生成 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 工具區塊 -->
+        <section id="tools" class="section">
+            <div class="container">
+                <h2 class="section-title">進階工具</h2>
+
+                <!-- 咖啡豆庫存管理 -->
+                <div class="card">
+                    <h3 class="card-title">咖啡豆庫存</h3>
+                    <div id="inventoryList" class="inventory-grid">
+                        <p class="empty-message">尚未添加任何咖啡豆</p>
+                    </div>
+                    <button id="addInventoryBtn" class="btn btn-primary" style="margin-top: 15px;">+ 添加咖啡豆</button>
+                </div>
+
+                <!-- 萃取率計算器 -->
+                <div class="card">
+                    <h3 class="card-title">萃取率計算器</h3>
+                    <div class="extraction-calculator">
+                        <div class="extraction-inputs">
+                            <div class="form-group">
+                                <label>咖啡粉重 (g)</label>
+                                <input type="number" id="extractCoffee" value="18" min="1" max="100">
+                            </div>
+                            <div class="form-group">
+                                <label>咖啡液重 (g)</label>
+                                <input type="number" id="extractBrew" value="36" min="1" max="500">
+                            </div>
+                            <div class="form-group">
+                                <label>TDS (%)</label>
+                                <input type="number" id="extractTDS" value="1.35" min="0" max="5" step="0.01">
+                            </div>
+                        </div>
+                        <div class="extraction-result">
+                            <div class="extraction-value" id="extractionResult">18.0%</div>
+                            <div class="extraction-label">萃取率 (Extraction Yield)</div>
+                            <div class="extraction-gauge">
+                                <div class="extraction-pointer" id="extractionPointer" style="left: 50%;"></div>
+                            </div>
+                            <div class="extraction-zones">
+                                <span>萃取不足 &lt;18%</span>
+                                <span>金杯標準 18-22%</span>
+                                <span>過度萃取 &gt;22%</span>
+                            </div>
+                            <div id="goldenCupBadge" class="golden-cup" style="display: none;">
+                                <span>🏆</span> 金杯標準
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 配方比較 -->
+                <div class="card">
+                    <h3 class="card-title">配方比較</h3>
+                    <div class="compare-container">
+                        <div class="compare-column">
+                            <select id="compareRecipe1" class="compare-select">
+                                <option value="">選擇配方 A</option>
+                            </select>
+                            <div id="compareDetails1" class="compare-details">
+                                <p class="empty-message">請選擇一個配方</p>
+                            </div>
+                        </div>
+                        <div class="compare-vs">VS</div>
+                        <div class="compare-column">
+                            <select id="compareRecipe2" class="compare-select">
+                                <option value="">選擇配方 B</option>
+                            </select>
+                            <div id="compareDetails2" class="compare-details">
+                                <p class="empty-message">請選擇一個配方</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 沖煮統計 -->
+                <div class="card">
+                    <h3 class="card-title">沖煮統計</h3>
+                    <div class="stat-summary">
+                        <div class="stat-summary-item">
+                            <div class="stat-summary-value" id="statTotalBrews">0</div>
+                            <div class="stat-summary-label">總沖煮次數</div>
+                        </div>
+                        <div class="stat-summary-item">
+                            <div class="stat-summary-value" id="statAvgRating">0.0</div>
+                            <div class="stat-summary-label">平均評分</div>
+                        </div>
+                        <div class="stat-summary-item">
+                            <div class="stat-summary-value" id="statFavMethod">-</div>
+                            <div class="stat-summary-label">最常用方式</div>
+                        </div>
+                    </div>
+                    <div class="stats-container">
+                        <div class="stat-card">
+                            <div class="stat-card-title">近 7 天沖煮次數</div>
+                            <div class="stat-chart">
+                                <div id="weeklyBrewChart" class="stat-bar-chart">
+                                    <!-- 由 JS 動態生成 -->
+                                </div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-card-title">沖煮方式分佈</div>
+                            <div class="stat-chart">
+                                <div id="methodDistChart" class="stat-bar-chart">
+                                    <!-- 由 JS 動態生成 -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 成就系統 -->
+                <div class="card">
+                    <h3 class="card-title">成就系統</h3>
+                    <div class="total-points">
+                        <div class="total-points-value" id="totalPoints">0</div>
+                        <div class="total-points-label">總成就點數</div>
+                    </div>
+                    <div id="achievementsList" class="achievements-grid">
+                        <!-- 由 JS 動態生成 -->
+                    </div>
+                </div>
+
+                <!-- 匯出/匯入 -->
+                <div class="card">
+                    <h3 class="card-title">資料管理</h3>
+                    <p>匯出或匯入你的配方、日誌和設定</p>
+                    <div class="export-import-section">
+                        <button id="exportDataBtn" class="btn btn-secondary">📤 匯出資料</button>
+                        <div class="file-input-wrapper">
+                            <button class="btn btn-secondary">📥 匯入資料</button>
+                            <input type="file" id="importDataInput" accept=".json">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- 沖煮指南區塊 -->
         <section id="guide" class="section">
             <div class="container">
@@ -797,6 +970,70 @@
     <!-- Toast 通知 -->
     <div id="toast" class="toast"></div>
 
+    <!-- 添加庫存彈窗 -->
+    <div id="inventoryModal" class="modal">
+        <div class="modal-content">
+            <h3>添加咖啡豆</h3>
+            <form id="inventoryForm">
+                <div class="form-group">
+                    <label>咖啡豆名稱</label>
+                    <input type="text" id="inventoryName" placeholder="例：衣索比亞 耶加雪菲" required>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>烘焙日期</label>
+                        <input type="date" id="inventoryRoastDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label>剩餘量 (g)</label>
+                        <input type="number" id="inventoryAmount" value="250" min="0" max="5000" required>
+                    </div>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>產地</label>
+                        <input type="text" id="inventoryOrigin" placeholder="例：衣索比亞">
+                    </div>
+                    <div class="form-group">
+                        <label>烘焙度</label>
+                        <select id="inventoryRoast">
+                            <option value="light">淺焙</option>
+                            <option value="medium-light">中淺焙</option>
+                            <option value="medium" selected>中焙</option>
+                            <option value="medium-dark">中深焙</option>
+                            <option value="dark">深焙</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelInventory">取消</button>
+                    <button type="submit" class="btn btn-primary">添加</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 風味詳情彈窗 -->
+    <div id="flavorInfoModal" class="modal">
+        <div class="modal-content flavor-info-modal">
+            <div class="flavor-info-header">
+                <div class="flavor-info-icon" id="flavorInfoIcon"></div>
+                <div class="flavor-info-name" id="flavorInfoName"></div>
+            </div>
+            <p class="flavor-info-description" id="flavorInfoDesc"></p>
+            <div class="flavor-info-intensity" id="flavorInfoIntensity"></div>
+            <div class="flavor-info-origins" id="flavorInfoOrigins"></div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-primary" id="closeFlavorInfo">關閉</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 深色模式切換按鈕 -->
+    <button id="themeToggle" class="theme-toggle" aria-label="切換深色模式">
+        <span id="themeIcon">🌙</span>
+    </button>
+
     <footer class="footer">
         <div class="container">
             <p>☕ 咖啡沖煮指南 | 讓每一杯都完美</p>
@@ -822,5 +1059,20 @@
     </script>
     <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"
             onerror="document.getElementById('busuanzi_value_site_uv').textContent='--';document.getElementById('busuanzi_value_site_pv').textContent='--';"></script>
+
+    <!-- Service Worker 註冊 -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/coffee-brewing-guide/sw.js')
+                    .then(function(registration) {
+                        console.log('ServiceWorker 註冊成功');
+                    })
+                    .catch(function(error) {
+                        console.log('ServiceWorker 註冊失敗:', error);
+                    });
+            });
+        }
+    </script>
 </body>
 </html>
