@@ -1770,9 +1770,20 @@ function showFlavorInfo(flavor, category, subcolor, clickedItem) {
     descEl.textContent = flavor.description;
 
     if (flavor.origin && flavor.origin.length > 0) {
+        // 將產區 ID 轉換為中文名稱
+        const getOriginName = (originId) => {
+            if (typeof ORIGINS !== 'undefined' && ORIGINS[originId]) {
+                return ORIGINS[originId].name;
+            }
+            // 如果找不到對照，嘗試格式化 ID
+            return originId.split('-').map(word =>
+                word.charAt(0).toUpperCase() + word.slice(1)
+            ).join(' ');
+        };
+
         originsEl.innerHTML = `
             <span class="origins-label">常見產區：</span>
-            ${flavor.origin.map(o => `<span class="flavor-origin-tag" style="border-color: ${subcolor || category.color};">${escapeHtml(o)}</span>`).join('')}
+            ${flavor.origin.map(o => `<span class="flavor-origin-tag" style="border-color: ${subcolor || category.color};">${escapeHtml(getOriginName(o))}</span>`).join('')}
         `;
     } else {
         originsEl.innerHTML = '';
