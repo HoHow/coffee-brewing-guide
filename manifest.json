@@ -1,0 +1,23 @@
+{
+    "name": "咖啡沖煮指南",
+    "short_name": "咖啡指南",
+    "description": "專業咖啡沖煮計算器、風味預測、配方庫與互動式沖煮教學",
+    "start_url": "/coffee-brewing-guide/",
+    "display": "standalone",
+    "background_color": "#FDF5E6",
+    "theme_color": "#8B4513",
+    "orientation": "portrait-primary",
+    "icons": [
+        {
+            "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>☕</text></svg>",
+            "sizes": "any",
+            "type": "image/svg+xml",
+            "purpose": "any maskable"
+        }
+    ],
+    "categories": ["food", "lifestyle", "utilities"],
+    "lang": "zh-TW",
+    "dir": "ltr",
+    "scope": "/coffee-brewing-guide/",
+    "prefer_related_applications": false
+}
