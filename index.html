@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <!-- 安全性標頭 -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
+
     <!-- SEO 基本標籤 -->
     <title>咖啡沖煮指南 | 手沖參數計算器、配方庫與沖煮教學</title>
     <meta name="description" content="免費咖啡沖煮工具：水粉比計算器、風味預測、16種沖煮方式教學（V60、愛樂壓、法壓壺等）、60+產地資料庫。從新手到專家，讓每一杯咖啡都完美。">
@@ -805,6 +809,18 @@
 
     <script src="js/data.js"></script>
     <script src="js/app.js"></script>
-    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+    <!-- 訪客統計（含載入失敗處理） -->
+    <script>
+        // 設定超時，若第三方腳本載入失敗則顯示替代文字
+        setTimeout(function() {
+            var uvEl = document.getElementById('busuanzi_value_site_uv');
+            var pvEl = document.getElementById('busuanzi_value_site_pv');
+            if (uvEl && uvEl.textContent === '-') uvEl.textContent = '--';
+            if (pvEl && pvEl.textContent === '-') pvEl.textContent = '--';
+        }, 5000);
+    </script>
+    <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"
+            onerror="document.getElementById('busuanzi_value_site_uv').textContent='--';document.getElementById('busuanzi_value_site_pv').textContent='--';"></script>
 </body>
 </html>

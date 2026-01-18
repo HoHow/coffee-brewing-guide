@@ -1,3 +1,56 @@
+// ========================================
+// 安全性工具函數
+// ========================================
+
+// HTML 字元轉義，防止 XSS 攻擊
+function escapeHTML(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+// 驗證物件是否符合預期結構
+function validateRecipe(recipe) {
+    return recipe &&
+        typeof recipe.id === 'string' &&
+        typeof recipe.name === 'string' &&
+        typeof recipe.method === 'string' &&
+        typeof recipe.coffee === 'number' &&
+        typeof recipe.water === 'number' &&
+        typeof recipe.ratio === 'number';
+}
+
+function validateJournalEntry(entry) {
+    return entry &&
+        typeof entry.id === 'string' &&
+        typeof entry.date === 'string' &&
+        typeof entry.method === 'string' &&
+        typeof entry.coffee === 'number' &&
+        typeof entry.water === 'number';
+}
+
+// 共用的 AudioContext 實例（避免記憶體洩漏）
+let sharedAudioContext = null;
+
+function getAudioContext() {
+    if (!sharedAudioContext) {
+        try {
+            sharedAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+        } catch (e) {
+            return null;
+        }
+    }
+    return sharedAudioContext;
+}
+
+// ========================================
+// 應用程式狀態
+// ========================================
+
 // 應用程式狀態
 const state = {
     currentMethod: 'v60',
@@ -143,16 +196,38 @@ function init() {
     setupHeroCTA();
 }
 
-// 從 localStorage 載入資料
+// 從 localStorage 載入資料（含錯誤處理與資料驗證）
 function loadFromStorage() {
-    const savedRecipes = localStorage.getItem('coffeeRecipes');
-    const savedJournal = localStorage.getItem('coffeeJournal');
-
-    if (savedRecipes) {
-        state.myRecipes = JSON.parse(savedRecipes);
+    // 載入配方
+    try {
+        const savedRecipes = localStorage.getItem('coffeeRecipes');
+        if (savedRecipes) {
+            const parsed = JSON.parse(savedRecipes);
+            // 驗證資料結構並過濾無效項目
+            if (Array.isArray(parsed)) {
+                state.myRecipes = parsed.filter(validateRecipe);
+            }
+        }
+    } catch (e) {
+        console.warn('載入配方資料時發生錯誤，已重置：', e);
+        localStorage.removeItem('coffeeRecipes');
+        state.myRecipes = [];
     }
-    if (savedJournal) {
-        state.journalEntries = JSON.parse(savedJournal);
+
+    // 載入日誌
+    try {
+        const savedJournal = localStorage.getItem('coffeeJournal');
+        if (savedJournal) {
+            const parsed = JSON.parse(savedJournal);
+            // 驗證資料結構並過濾無效項目
+            if (Array.isArray(parsed)) {
+                state.journalEntries = parsed.filter(validateJournalEntry);
+            }
+        }
+    } catch (e) {
+        console.warn('載入日誌資料時發生錯誤，已重置：', e);
+        localStorage.removeItem('coffeeJournal');
+        state.journalEntries = [];
     }
 }
 
@@ -913,18 +988,18 @@ function renderMyRecipes() {
     });
 }
 
-// 創建配方 HTML
+// 創建配方 HTML（使用 escapeHTML 防止 XSS）
 function createRecipeHTML(recipe, isDefault) {
     const methodName = BREW_METHODS[recipe.method]?.name || recipe.method;
-    const originText = recipe.origin ? `<span class="recipe-origin">${recipe.origin}</span>` : '';
+    const originText = recipe.origin ? `<span class="recipe-origin">${escapeHTML(recipe.origin)}</span>` : '';
     const roastText = { light: '淺焙', medium: '中焙', dark: '深焙' }[recipe.roast] || '';
     return `
-        <div class="recipe-item" data-id="${recipe.id}">
+        <div class="recipe-item" data-id="${escapeHTML(recipe.id)}">
             <div class="recipe-info">
-                <h4>${recipe.name}</h4>
-                <p>${methodName} | ${recipe.coffee}g : ${recipe.water}ml | ${roastText} | ${recipe.temp}°C</p>
+                <h4>${escapeHTML(recipe.name)}</h4>
+                <p>${escapeHTML(methodName)} | ${recipe.coffee}g : ${recipe.water}ml | ${roastText} | ${recipe.temp}°C</p>
                 ${originText}
-                ${recipe.notes ? `<p class="recipe-notes">${recipe.notes}</p>` : ''}
+                ${recipe.notes ? `<p class="recipe-notes">${escapeHTML(recipe.notes)}</p>` : ''}
             </div>
             <div class="recipe-actions">
                 <button class="btn btn-small btn-primary load-recipe">載入</button>
@@ -959,7 +1034,7 @@ function loadRecipe(recipe) {
 
     updateCalculator();
     switchSection('calculator');
-    showToast(`已載入「${recipe.name}」配方`);
+    showToast(`已載入「${escapeHTML(recipe.name)}」配方`);
 }
 
 // 刪除配方
@@ -1029,7 +1104,8 @@ function renderJournalEntries() {
 
     elements.journalEntries.innerHTML = state.journalEntries.map(entry => {
         const methodName = BREW_METHODS[entry.method]?.name || entry.method;
-        const stars = '★'.repeat(entry.rating) + '☆'.repeat(5 - entry.rating);
+        const rating = Math.max(0, Math.min(5, entry.rating || 0)); // 確保評分在 0-5 之間
+        const stars = '★'.repeat(rating) + '☆'.repeat(5 - rating);
         const formattedDate = new Date(entry.date).toLocaleDateString('zh-TW', {
             year: 'numeric',
             month: 'long',
@@ -1037,20 +1113,20 @@ function renderJournalEntries() {
         });
 
         return `
-            <div class="journal-entry" data-id="${entry.id}">
+            <div class="journal-entry" data-id="${escapeHTML(entry.id)}">
                 <div class="journal-header">
-                    <span class="journal-date">${formattedDate}</span>
+                    <span class="journal-date">${escapeHTML(formattedDate)}</span>
                     <span class="journal-rating">${stars}</span>
                 </div>
                 <div class="journal-params">
-                    <span>${methodName}</span>
-                    ${entry.bean ? `<span>${entry.bean}</span>` : ''}
+                    <span>${escapeHTML(methodName)}</span>
+                    ${entry.bean ? `<span>${escapeHTML(entry.bean)}</span>` : ''}
                     <span>${entry.coffee}g : ${entry.water}ml</span>
                     <span>${entry.temp}°C</span>
                 </div>
-                ${entry.notes ? `<div class="journal-notes">"${entry.notes}"</div>` : ''}
+                ${entry.notes ? `<div class="journal-notes">"${escapeHTML(entry.notes)}"</div>` : ''}
                 <div class="journal-actions">
-                    <button class="btn btn-small btn-secondary delete-journal" data-id="${entry.id}">刪除</button>
+                    <button class="btn btn-small btn-secondary delete-journal" data-id="${escapeHTML(entry.id)}">刪除</button>
                 </div>
             </div>
         `;
@@ -1309,21 +1385,29 @@ function showStepAlert(message) {
     elements.stepAlertText.textContent = message;
     elements.currentStepAlert.style.display = 'flex';
 
-    // 播放提示音（如果瀏覽器支援）
+    // 播放提示音（使用共用 AudioContext 避免記憶體洩漏）
     try {
-        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        const oscillator = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
+        const audioContext = getAudioContext();
+        if (audioContext) {
+            // 確保 AudioContext 處於運行狀態
+            if (audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
 
-        oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
 
-        oscillator.frequency.value = 800;
-        oscillator.type = 'sine';
-        gainNode.gain.value = 0.3;
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
 
-        oscillator.start();
-        setTimeout(() => oscillator.stop(), 200);
+            oscillator.frequency.value = 800;
+            oscillator.type = 'sine';
+            gainNode.gain.value = 0.3;
+
+            const now = audioContext.currentTime;
+            oscillator.start(now);
+            oscillator.stop(now + 0.2);
+        }
     } catch (e) {
         // 忽略音效錯誤
     }
