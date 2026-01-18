@@ -136,6 +136,11 @@ function init() {
     renderMyRecipes();
     renderJournalEntries();
     setTodayDate();
+
+    // 初始化 Hero 和滾動動畫
+    initHeroAnimations();
+    initScrollAnimations();
+    setupHeroCTA();
 }
 
 // 從 localStorage 載入資料
@@ -280,13 +285,32 @@ function setupEventListeners() {
 
 // 切換區段
 function switchSection(sectionId) {
+    // 更新導航連結狀態
     elements.navLinks.forEach(link => {
         link.classList.toggle('active', link.dataset.section === sectionId);
     });
 
+    // 隱藏所有區段（包括 Hero）
     elements.sections.forEach(section => {
-        section.classList.toggle('active', section.id === sectionId);
+        section.classList.remove('active');
     });
+
+    // 處理 Hero 區塊
+    const heroSection = document.getElementById('hero');
+    if (heroSection) {
+        heroSection.classList.toggle('active', sectionId === 'hero');
+    }
+
+    // 顯示目標區段
+    const targetSection = document.getElementById(sectionId);
+    if (targetSection) {
+        targetSection.classList.add('active');
+    }
+
+    // 滾動到頁面頂部
+    if (sectionId !== 'hero') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
 }
 
 // 選擇沖煮方式
@@ -1318,6 +1342,78 @@ function showToast(message) {
     setTimeout(() => {
         elements.toast.classList.remove('show');
     }, 2500);
+}
+
+// ========================================
+// Hero Section 功能
+// ========================================
+
+// 初始化 Hero 載入動畫
+function initHeroAnimations() {
+    const heroElements = document.querySelectorAll('.hero-content .fade-in-up');
+
+    // 延遲後觸發動畫，讓頁面有時間載入
+    setTimeout(() => {
+        heroElements.forEach(el => {
+            el.classList.add('visible');
+        });
+    }, 100);
+}
+
+// 初始化滾動動畫 (Intersection Observer)
+function initScrollAnimations() {
+    // 為所有卡片添加 fade-in-up 類別
+    const cards = document.querySelectorAll('.section .card');
+    cards.forEach(card => {
+        if (!card.classList.contains('fade-in-up')) {
+            card.classList.add('fade-in-up');
+        }
+    });
+
+    // 設置 Intersection Observer
+    const observerOptions = {
+        root: null, // 使用視窗作為根
+        rootMargin: '0px 0px -50px 0px', // 提前觸發
+        threshold: 0.1 // 10% 可見時觸發
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                // 一旦動畫觸發，停止觀察
+                observer.unobserve(entry.target);
+            }
+        });
+    }, observerOptions);
+
+    // 觀察所有帶有 fade-in-up 類別的元素（排除 Hero 內的元素）
+    const fadeElements = document.querySelectorAll('.section .fade-in-up');
+    fadeElements.forEach(el => {
+        observer.observe(el);
+    });
+}
+
+// 設置 Hero CTA 按鈕事件
+function setupHeroCTA() {
+    const ctaButtons = document.querySelectorAll('.hero-cta a[data-section]');
+
+    ctaButtons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const section = btn.dataset.section;
+            switchSection(section);
+        });
+    });
+
+    // 點擊滾動指示器時滾動到下一個區塊
+    const scrollIndicator = document.querySelector('.scroll-indicator');
+    if (scrollIndicator) {
+        scrollIndicator.addEventListener('click', () => {
+            switchSection('calculator');
+        });
+        scrollIndicator.style.cursor = 'pointer';
+    }
 }
 
 // 啟動應用程式

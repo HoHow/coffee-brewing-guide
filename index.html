@@ -60,7 +60,8 @@
         <div class="container">
             <h1 class="logo">☕ 咖啡沖煮指南</h1>
             <nav class="nav">
-                <a href="#calculator" class="nav-link active" data-section="calculator">參數計算</a>
+                <a href="#hero" class="nav-link active" data-section="hero">首頁</a>
+                <a href="#calculator" class="nav-link" data-section="calculator">參數計算</a>
                 <a href="#recipes" class="nav-link" data-section="recipes">配方庫</a>
                 <a href="#journal" class="nav-link" data-section="journal">沖煮日誌</a>
                 <a href="#guide" class="nav-link" data-section="guide">沖煮指南</a>
@@ -69,8 +70,26 @@
     </header>
 
     <main class="main">
+        <!-- Hero Section 首頁 -->
+        <section id="hero" class="hero-section active">
+            <div class="hero-background" style="background-image: url('https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=1920&q=80');"></div>
+            <div class="hero-overlay"></div>
+            <div class="hero-content">
+                <h2 class="hero-title fade-in-up">讓每一杯咖啡都完美</h2>
+                <p class="hero-subtitle fade-in-up">專業沖煮計算器、風味預測、配方庫與互動式教學指南</p>
+                <div class="hero-cta fade-in-up">
+                    <a href="#calculator" class="btn-hero-primary" data-section="calculator">開始計算</a>
+                    <a href="#guide" class="btn-hero-secondary" data-section="guide">瀏覽指南</a>
+                </div>
+            </div>
+            <div class="scroll-indicator">
+                <span class="scroll-text">向下滾動探索更多</span>
+                <div class="scroll-arrow"></div>
+            </div>
+        </section>
+
         <!-- 參數計算器區塊 -->
-        <section id="calculator" class="section active">
+        <section id="calculator" class="section">
             <div class="container">
                 <h2 class="section-title">沖煮參數計算器</h2>
 
