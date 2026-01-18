@@ -1981,7 +1981,7 @@ function initRecipeCompare() {
     if (!select1 || !select2) return;
 
     // 填充配方選項
-    const allRecipes = [...DEFAULT_RECIPES, ...recipes];
+    const allRecipes = [...DEFAULT_RECIPES, ...state.myRecipes];
     const options = allRecipes.map(r => `<option value="${r.id}">${escapeHtml(r.name)}</option>`).join('');
 
     select1.innerHTML = '<option value="">選擇配方 A</option>' + options;
@@ -2000,7 +2000,7 @@ function updateCompareDetails(num) {
         return;
     }
 
-    const allRecipes = [...DEFAULT_RECIPES, ...recipes];
+    const allRecipes = [...DEFAULT_RECIPES, ...state.myRecipes];
     const recipe = allRecipes.find(r => r.id == select.value);
 
     if (!recipe) return;
@@ -2060,6 +2060,8 @@ function updateStats() {
 
     if (!totalBrews) return;
 
+    const journal = state.journalEntries;
+
     // 計算統計數據
     totalBrews.textContent = journal.length;
 
@@ -2088,6 +2090,7 @@ function renderWeeklyChart() {
     const container = document.getElementById('weeklyBrewChart');
     if (!container) return;
 
+    const journal = state.journalEntries;
     const days = ['日', '一', '二', '三', '四', '五', '六'];
     const today = new Date();
     const weekData = [];
@@ -2118,6 +2121,7 @@ function renderMethodChart() {
     const container = document.getElementById('methodDistChart');
     if (!container) return;
 
+    const journal = state.journalEntries;
     const methodCounts = {};
     journal.forEach(j => {
         const name = BREW_METHODS[j.method]?.name || j.method;
@@ -2195,6 +2199,8 @@ function checkAchievements() {
 
 function checkAchievementCondition(achievement) {
     const cond = achievement.condition;
+    const journal = state.journalEntries;
+    const recipes = state.myRecipes;
 
     switch (cond.type) {
         case 'journal_count':
@@ -2273,8 +2279,8 @@ function exportData() {
     const data = {
         version: '1.0',
         exportDate: new Date().toISOString(),
-        recipes: recipes,
-        journal: journal,
+        recipes: state.myRecipes,
+        journal: state.journalEntries,
         inventory: coffeeInventory,
         achievements: unlockedAchievements,
         theme: localStorage.getItem('coffeeGuideTheme')
@@ -2305,23 +2311,23 @@ function importData(e) {
             if (data.recipes && Array.isArray(data.recipes)) {
                 // 驗證並匯入配方
                 data.recipes.forEach(r => {
-                    if (validateRecipe(r) && !recipes.find(existing => existing.id === r.id)) {
-                        recipes.push(r);
+                    if (validateRecipe(r) && !state.myRecipes.find(existing => existing.id === r.id)) {
+                        state.myRecipes.push(r);
                     }
                 });
-                saveRecipes();
+                saveToStorage();
                 renderMyRecipes();
             }
 
             if (data.journal && Array.isArray(data.journal)) {
                 // 驗證並匯入日誌
                 data.journal.forEach(j => {
-                    if (validateJournalEntry(j) && !journal.find(existing => existing.id === j.id)) {
-                        journal.push(j);
+                    if (validateJournalEntry(j) && !state.journalEntries.find(existing => existing.id === j.id)) {
+                        state.journalEntries.push(j);
                     }
                 });
-                saveJournal();
-                renderJournal();
+                saveToStorage();
+                renderJournalEntries();
             }
 
             if (data.inventory && Array.isArray(data.inventory)) {
