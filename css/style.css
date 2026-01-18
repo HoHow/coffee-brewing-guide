@@ -1051,6 +1051,12 @@ body {
     margin-top: 40px;
 }
 
+.visitor-stats {
+    margin-top: 10px;
+    font-size: 0.85em;
+    opacity: 0.8;
+}
+
 /* Empty Message */
 .empty-message {
     text-align: center;

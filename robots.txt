@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://hohow.github.io/coffee-brewing-guide/sitemap.xml
