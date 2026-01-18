@@ -3,7 +3,7 @@
 // ========================================
 
 // HTML 字元轉義，防止 XSS 攻擊
-function escapeHTML(str) {
+function escapeHtml(str) {
     if (str === null || str === undefined) return '';
     return String(str)
         .replace(/&/g, '&amp;')
@@ -12,6 +12,8 @@ function escapeHTML(str) {
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#039;');
 }
+// 別名保持向後相容
+const escapeHTML = escapeHtml;
 
 // 驗證物件是否符合預期結構
 function validateRecipe(recipe) {
@@ -1526,3 +1528,715 @@ function setupHeroCTA() {
 
 // 啟動應用程式
 document.addEventListener('DOMContentLoaded', init);
+
+// ========================================
+// 深色模式功能
+// ========================================
+function initThemeToggle() {
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+
+    if (!themeToggle) return;
+
+    // 從 localStorage 讀取主題設定
+    const savedTheme = localStorage.getItem('coffeeGuideTheme');
+    if (savedTheme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        themeIcon.textContent = '☀️';
+    }
+
+    themeToggle.addEventListener('click', () => {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        if (currentTheme === 'dark') {
+            document.documentElement.removeAttribute('data-theme');
+            localStorage.setItem('coffeeGuideTheme', 'light');
+            themeIcon.textContent = '🌙';
+        } else {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            localStorage.setItem('coffeeGuideTheme', 'dark');
+            themeIcon.textContent = '☀️';
+        }
+    });
+}
+
+// ========================================
+// 風味輪功能
+// ========================================
+function initFlavorWheel() {
+    if (typeof FLAVOR_WHEEL === 'undefined') return;
+
+    const categoryList = document.getElementById('flavorCategoryList');
+    const detailPanel = document.getElementById('flavorDetailPanel');
+
+    if (!categoryList) return;
+
+    // 渲染風味類別
+    categoryList.innerHTML = FLAVOR_WHEEL.categories.map(cat => `
+        <div class="flavor-category-item" data-category="${escapeHtml(cat.id)}" style="background-color: ${escapeHtml(cat.color)}20;">
+            <div class="flavor-category-icon">${escapeHtml(cat.icon)}</div>
+            <div class="flavor-category-name">${escapeHtml(cat.name)}</div>
+        </div>
+    `).join('');
+
+    // 類別點擊事件
+    categoryList.querySelectorAll('.flavor-category-item').forEach(item => {
+        item.addEventListener('click', () => {
+            const categoryId = item.dataset.category;
+            showFlavorCategory(categoryId);
+
+            // 更新 active 狀態
+            categoryList.querySelectorAll('.flavor-category-item').forEach(i => i.classList.remove('active'));
+            item.classList.add('active');
+        });
+    });
+}
+
+function showFlavorCategory(categoryId) {
+    const category = FLAVOR_WHEEL.categories.find(c => c.id === categoryId);
+    if (!category) return;
+
+    const detailPanel = document.getElementById('flavorDetailPanel');
+    const titleEl = document.getElementById('flavorCategoryTitle');
+    const descEl = document.getElementById('flavorCategoryDesc');
+    const subcatEl = document.getElementById('flavorSubcategories');
+
+    titleEl.innerHTML = `${escapeHtml(category.icon)} ${escapeHtml(category.name)}`;
+    descEl.textContent = category.description;
+
+    // 渲染子類別和風味
+    subcatEl.innerHTML = category.subcategories.map(sub => `
+        <div class="flavor-subcategory">
+            <h5 class="flavor-subcategory-title" style="color: ${escapeHtml(sub.color)};">${escapeHtml(sub.name)}</h5>
+            <div class="flavor-items">
+                ${sub.flavors.map(flavor => `
+                    <span class="flavor-item"
+                          data-flavor='${JSON.stringify(flavor).replace(/'/g, "&#39;")}'
+                          style="border-color: ${escapeHtml(sub.color)};">
+                        ${escapeHtml(flavor.name)}
+                    </span>
+                `).join('')}
+            </div>
+        </div>
+    `).join('');
+
+    // 風味項目點擊事件
+    subcatEl.querySelectorAll('.flavor-item').forEach(item => {
+        item.addEventListener('click', () => {
+            try {
+                const flavor = JSON.parse(item.dataset.flavor);
+                showFlavorInfo(flavor, category);
+            } catch (e) {
+                console.error('解析風味資料失敗');
+            }
+        });
+    });
+
+    detailPanel.style.display = 'block';
+}
+
+function showFlavorInfo(flavor, category) {
+    const modal = document.getElementById('flavorInfoModal');
+    const iconEl = document.getElementById('flavorInfoIcon');
+    const nameEl = document.getElementById('flavorInfoName');
+    const descEl = document.getElementById('flavorInfoDesc');
+    const intensityEl = document.getElementById('flavorInfoIntensity');
+    const originsEl = document.getElementById('flavorInfoOrigins');
+
+    iconEl.style.backgroundColor = category.color + '30';
+    iconEl.textContent = category.icon;
+    nameEl.textContent = flavor.name;
+    descEl.textContent = flavor.description;
+
+    const intensityLabels = { low: '輕微', medium: '中等', high: '明顯' };
+    intensityEl.innerHTML = `<strong>強度：</strong>${intensityLabels[flavor.intensity] || flavor.intensity}`;
+
+    if (flavor.origin && flavor.origin.length > 0) {
+        originsEl.innerHTML = `
+            <strong>常見產區：</strong><br>
+            ${flavor.origin.map(o => `<span class="flavor-origin-tag">${escapeHtml(o)}</span>`).join('')}
+        `;
+    } else {
+        originsEl.innerHTML = '';
+    }
+
+    modal.classList.add('active');
+
+    document.getElementById('closeFlavorInfo').onclick = () => {
+        modal.classList.remove('active');
+    };
+}
+
+// ========================================
+// 咖啡豆庫存管理
+// ========================================
+let coffeeInventory = [];
+
+function initInventory() {
+    loadInventory();
+    renderInventory();
+
+    const addBtn = document.getElementById('addInventoryBtn');
+    const modal = document.getElementById('inventoryModal');
+    const form = document.getElementById('inventoryForm');
+    const cancelBtn = document.getElementById('cancelInventory');
+
+    if (addBtn) {
+        addBtn.addEventListener('click', () => {
+            modal.classList.add('active');
+            document.getElementById('inventoryRoastDate').valueAsDate = new Date();
+        });
+    }
+
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', () => {
+            modal.classList.remove('active');
+            form.reset();
+        });
+    }
+
+    if (form) {
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            addInventoryItem();
+            modal.classList.remove('active');
+            form.reset();
+        });
+    }
+}
+
+function loadInventory() {
+    try {
+        const data = localStorage.getItem('coffeeInventory');
+        coffeeInventory = data ? JSON.parse(data) : [];
+    } catch (e) {
+        coffeeInventory = [];
+    }
+}
+
+function saveInventory() {
+    try {
+        localStorage.setItem('coffeeInventory', JSON.stringify(coffeeInventory));
+    } catch (e) {
+        console.error('儲存庫存失敗');
+    }
+}
+
+function addInventoryItem() {
+    const name = document.getElementById('inventoryName').value.trim();
+    const roastDate = document.getElementById('inventoryRoastDate').value;
+    const amount = parseInt(document.getElementById('inventoryAmount').value) || 0;
+    const origin = document.getElementById('inventoryOrigin').value.trim();
+    const roast = document.getElementById('inventoryRoast').value;
+
+    if (!name || !roastDate) return;
+
+    const item = {
+        id: Date.now(),
+        name: name,
+        roastDate: roastDate,
+        amount: amount,
+        origin: origin,
+        roast: roast
+    };
+
+    coffeeInventory.push(item);
+    saveInventory();
+    renderInventory();
+    showToast('咖啡豆已添加');
+}
+
+function renderInventory() {
+    const container = document.getElementById('inventoryList');
+    if (!container) return;
+
+    if (coffeeInventory.length === 0) {
+        container.innerHTML = '<p class="empty-message">尚未添加任何咖啡豆</p>';
+        return;
+    }
+
+    container.innerHTML = coffeeInventory.map(item => {
+        const roastDate = new Date(item.roastDate);
+        const today = new Date();
+        const daysSinceRoast = Math.floor((today - roastDate) / (1000 * 60 * 60 * 24));
+
+        let freshness, freshnessClass;
+        if (daysSinceRoast <= 14) {
+            freshness = '新鮮';
+            freshnessClass = 'fresh';
+        } else if (daysSinceRoast <= 30) {
+            freshness = '適飲';
+            freshnessClass = 'ok';
+        } else {
+            freshness = '較舊';
+            freshnessClass = 'old';
+        }
+
+        const roastLabels = {
+            'light': '淺焙',
+            'medium-light': '中淺焙',
+            'medium': '中焙',
+            'medium-dark': '中深焙',
+            'dark': '深焙'
+        };
+
+        return `
+            <div class="inventory-item" data-id="${item.id}">
+                <div class="inventory-header">
+                    <span class="inventory-name">${escapeHtml(item.name)}</span>
+                    <span class="inventory-freshness ${freshnessClass}">${freshness} (${daysSinceRoast}天)</span>
+                </div>
+                <div class="inventory-details">
+                    ${item.origin ? `<span class="inventory-tag">${escapeHtml(item.origin)}</span>` : ''}
+                    <span class="inventory-tag">${roastLabels[item.roast] || item.roast}</span>
+                </div>
+                <div class="inventory-amount">
+                    <div class="inventory-bar">
+                        <div class="inventory-bar-fill" style="width: ${Math.min(item.amount / 500 * 100, 100)}%;"></div>
+                    </div>
+                    <span class="inventory-amount-text">${item.amount}g</span>
+                </div>
+                <button class="btn btn-secondary" onclick="deleteInventoryItem(${item.id})" style="margin-top: 10px; padding: 5px 10px; font-size: 0.8rem;">刪除</button>
+            </div>
+        `;
+    }).join('');
+}
+
+function deleteInventoryItem(id) {
+    coffeeInventory = coffeeInventory.filter(item => item.id !== id);
+    saveInventory();
+    renderInventory();
+    showToast('已刪除');
+}
+
+// ========================================
+// 萃取率計算器
+// ========================================
+function initExtractionCalculator() {
+    const coffeeInput = document.getElementById('extractCoffee');
+    const brewInput = document.getElementById('extractBrew');
+    const tdsInput = document.getElementById('extractTDS');
+
+    if (!coffeeInput || !brewInput || !tdsInput) return;
+
+    const calculate = () => {
+        const coffee = parseFloat(coffeeInput.value) || 18;
+        const brew = parseFloat(brewInput.value) || 36;
+        const tds = parseFloat(tdsInput.value) || 1.35;
+
+        // 萃取率 = (咖啡液重 × TDS%) / 咖啡粉重 × 100
+        const extraction = (brew * tds / 100) / coffee * 100;
+
+        document.getElementById('extractionResult').textContent = extraction.toFixed(1) + '%';
+
+        // 更新指針位置 (10% - 30% 範圍)
+        const pointer = document.getElementById('extractionPointer');
+        const position = Math.min(Math.max((extraction - 10) / 20 * 100, 0), 100);
+        pointer.style.left = position + '%';
+
+        // 金杯標準 (18-22%)
+        const badge = document.getElementById('goldenCupBadge');
+        if (extraction >= 18 && extraction <= 22) {
+            badge.style.display = 'inline-flex';
+        } else {
+            badge.style.display = 'none';
+        }
+    };
+
+    coffeeInput.addEventListener('input', calculate);
+    brewInput.addEventListener('input', calculate);
+    tdsInput.addEventListener('input', calculate);
+
+    calculate();
+}
+
+// ========================================
+// 配方比較功能
+// ========================================
+function initRecipeCompare() {
+    const select1 = document.getElementById('compareRecipe1');
+    const select2 = document.getElementById('compareRecipe2');
+
+    if (!select1 || !select2) return;
+
+    // 填充配方選項
+    const allRecipes = [...DEFAULT_RECIPES, ...recipes];
+    const options = allRecipes.map(r => `<option value="${r.id}">${escapeHtml(r.name)}</option>`).join('');
+
+    select1.innerHTML = '<option value="">選擇配方 A</option>' + options;
+    select2.innerHTML = '<option value="">選擇配方 B</option>' + options;
+
+    select1.addEventListener('change', () => updateCompareDetails(1));
+    select2.addEventListener('change', () => updateCompareDetails(2));
+}
+
+function updateCompareDetails(num) {
+    const select = document.getElementById(`compareRecipe${num}`);
+    const details = document.getElementById(`compareDetails${num}`);
+
+    if (!select.value) {
+        details.innerHTML = '<p class="empty-message">請選擇一個配方</p>';
+        return;
+    }
+
+    const allRecipes = [...DEFAULT_RECIPES, ...recipes];
+    const recipe = allRecipes.find(r => r.id == select.value);
+
+    if (!recipe) return;
+
+    const methodName = BREW_METHODS[recipe.method]?.name || recipe.method;
+    const roastLabels = {
+        'light': '淺焙',
+        'medium-light': '中淺焙',
+        'medium': '中焙',
+        'medium-dark': '中深焙',
+        'dark': '深焙'
+    };
+
+    details.innerHTML = `
+        <div class="compare-header">
+            <div class="compare-title">${escapeHtml(recipe.name)}</div>
+        </div>
+        <div class="compare-row">
+            <span class="compare-label">沖煮方式</span>
+            <span class="compare-value">${escapeHtml(methodName)}</span>
+        </div>
+        <div class="compare-row">
+            <span class="compare-label">咖啡粉</span>
+            <span class="compare-value">${recipe.coffee}g</span>
+        </div>
+        <div class="compare-row">
+            <span class="compare-label">水量</span>
+            <span class="compare-value">${recipe.water}ml</span>
+        </div>
+        <div class="compare-row">
+            <span class="compare-label">水粉比</span>
+            <span class="compare-value">1:${recipe.ratio}</span>
+        </div>
+        <div class="compare-row">
+            <span class="compare-label">烘焙度</span>
+            <span class="compare-value">${roastLabels[recipe.roast] || recipe.roast}</span>
+        </div>
+        ${recipe.origin ? `
+        <div class="compare-row">
+            <span class="compare-label">產地</span>
+            <span class="compare-value">${escapeHtml(recipe.origin)}</span>
+        </div>` : ''}
+    `;
+}
+
+// ========================================
+// 統計圖表功能
+// ========================================
+function initStats() {
+    updateStats();
+}
+
+function updateStats() {
+    const totalBrews = document.getElementById('statTotalBrews');
+    const avgRating = document.getElementById('statAvgRating');
+    const favMethod = document.getElementById('statFavMethod');
+
+    if (!totalBrews) return;
+
+    // 計算統計數據
+    totalBrews.textContent = journal.length;
+
+    if (journal.length > 0) {
+        const ratings = journal.filter(j => j.rating > 0).map(j => j.rating);
+        const avg = ratings.length > 0 ? (ratings.reduce((a, b) => a + b, 0) / ratings.length) : 0;
+        avgRating.textContent = avg.toFixed(1);
+
+        // 找最常用的方法
+        const methodCounts = {};
+        journal.forEach(j => {
+            methodCounts[j.method] = (methodCounts[j.method] || 0) + 1;
+        });
+        const topMethod = Object.entries(methodCounts).sort((a, b) => b[1] - a[1])[0];
+        if (topMethod) {
+            favMethod.textContent = BREW_METHODS[topMethod[0]]?.name || topMethod[0];
+        }
+    }
+
+    // 渲染圖表
+    renderWeeklyChart();
+    renderMethodChart();
+}
+
+function renderWeeklyChart() {
+    const container = document.getElementById('weeklyBrewChart');
+    if (!container) return;
+
+    const days = ['日', '一', '二', '三', '四', '五', '六'];
+    const today = new Date();
+    const weekData = [];
+
+    for (let i = 6; i >= 0; i--) {
+        const date = new Date(today);
+        date.setDate(date.getDate() - i);
+        const dateStr = date.toISOString().split('T')[0];
+        const count = journal.filter(j => j.date === dateStr).length;
+        weekData.push({
+            day: days[date.getDay()],
+            count: count
+        });
+    }
+
+    const maxCount = Math.max(...weekData.map(d => d.count), 1);
+
+    container.innerHTML = weekData.map(d => `
+        <div class="stat-bar">
+            <div class="stat-bar-value">${d.count}</div>
+            <div class="stat-bar-fill" style="height: ${(d.count / maxCount * 150) || 5}px;"></div>
+            <div class="stat-bar-label">${d.day}</div>
+        </div>
+    `).join('');
+}
+
+function renderMethodChart() {
+    const container = document.getElementById('methodDistChart');
+    if (!container) return;
+
+    const methodCounts = {};
+    journal.forEach(j => {
+        const name = BREW_METHODS[j.method]?.name || j.method;
+        methodCounts[name] = (methodCounts[name] || 0) + 1;
+    });
+
+    const sorted = Object.entries(methodCounts).sort((a, b) => b[1] - a[1]).slice(0, 5);
+    const maxCount = Math.max(...sorted.map(d => d[1]), 1);
+
+    if (sorted.length === 0) {
+        container.innerHTML = '<p class="empty-message">尚無資料</p>';
+        return;
+    }
+
+    container.innerHTML = sorted.map(([name, count]) => `
+        <div class="stat-bar">
+            <div class="stat-bar-value">${count}</div>
+            <div class="stat-bar-fill" style="height: ${(count / maxCount * 150) || 5}px;"></div>
+            <div class="stat-bar-label">${escapeHtml(name.substring(0, 4))}</div>
+        </div>
+    `).join('');
+}
+
+// ========================================
+// 成就系統
+// ========================================
+let unlockedAchievements = [];
+
+function initAchievements() {
+    loadAchievements();
+    checkAchievements();
+    renderAchievements();
+}
+
+function loadAchievements() {
+    try {
+        const data = localStorage.getItem('coffeeAchievements');
+        unlockedAchievements = data ? JSON.parse(data) : [];
+    } catch (e) {
+        unlockedAchievements = [];
+    }
+}
+
+function saveAchievements() {
+    try {
+        localStorage.setItem('coffeeAchievements', JSON.stringify(unlockedAchievements));
+    } catch (e) {
+        console.error('儲存成就失敗');
+    }
+}
+
+function checkAchievements() {
+    if (typeof ACHIEVEMENTS === 'undefined') return;
+
+    const allAchievements = [
+        ...ACHIEVEMENTS.brewing,
+        ...ACHIEVEMENTS.methods,
+        ...ACHIEVEMENTS.origins,
+        ...ACHIEVEMENTS.recipes,
+        ...ACHIEVEMENTS.ratings,
+        ...ACHIEVEMENTS.special
+    ];
+
+    allAchievements.forEach(achievement => {
+        if (unlockedAchievements.includes(achievement.id)) return;
+
+        if (checkAchievementCondition(achievement)) {
+            unlockedAchievements.push(achievement.id);
+            showToast(`🏆 獲得成就：${achievement.name}`);
+        }
+    });
+
+    saveAchievements();
+}
+
+function checkAchievementCondition(achievement) {
+    const cond = achievement.condition;
+
+    switch (cond.type) {
+        case 'journal_count':
+            return journal.length >= cond.value;
+        case 'recipe_count':
+            return recipes.length >= cond.value;
+        case 'method_used':
+            return journal.some(j => j.method === cond.value);
+        case 'rating':
+            return journal.some(j => j.rating >= cond.value);
+        case 'rating_count':
+            return journal.filter(j => j.rating > 0).length >= cond.value;
+        case 'all_methods':
+            const usedMethods = new Set(journal.map(j => j.method));
+            return usedMethods.size >= 16;
+        default:
+            return false;
+    }
+}
+
+function renderAchievements() {
+    const container = document.getElementById('achievementsList');
+    const pointsEl = document.getElementById('totalPoints');
+
+    if (!container || typeof ACHIEVEMENTS === 'undefined') return;
+
+    const allAchievements = [
+        ...ACHIEVEMENTS.brewing,
+        ...ACHIEVEMENTS.methods,
+        ...ACHIEVEMENTS.recipes,
+        ...ACHIEVEMENTS.ratings
+    ];
+
+    let totalPoints = 0;
+
+    container.innerHTML = allAchievements.map(a => {
+        const unlocked = unlockedAchievements.includes(a.id);
+        if (unlocked) totalPoints += a.points;
+
+        return `
+            <div class="achievement-item ${unlocked ? 'unlocked' : ''}">
+                <div class="achievement-header">
+                    <span class="achievement-icon">${a.icon}</span>
+                    <div class="achievement-info">
+                        <div class="achievement-name">${escapeHtml(a.name)}</div>
+                        <div class="achievement-points">+${a.points} 點</div>
+                    </div>
+                </div>
+                <div class="achievement-description">${escapeHtml(a.description)}</div>
+            </div>
+        `;
+    }).join('');
+
+    if (pointsEl) {
+        pointsEl.textContent = totalPoints;
+    }
+}
+
+// ========================================
+// 匯出/匯入功能
+// ========================================
+function initExportImport() {
+    const exportBtn = document.getElementById('exportDataBtn');
+    const importInput = document.getElementById('importDataInput');
+
+    if (exportBtn) {
+        exportBtn.addEventListener('click', exportData);
+    }
+
+    if (importInput) {
+        importInput.addEventListener('change', importData);
+    }
+}
+
+function exportData() {
+    const data = {
+        version: '1.0',
+        exportDate: new Date().toISOString(),
+        recipes: recipes,
+        journal: journal,
+        inventory: coffeeInventory,
+        achievements: unlockedAchievements,
+        theme: localStorage.getItem('coffeeGuideTheme')
+    };
+
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `coffee-guide-backup-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    showToast('資料已匯出');
+}
+
+function importData(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(event) {
+        try {
+            const data = JSON.parse(event.target.result);
+
+            if (data.recipes && Array.isArray(data.recipes)) {
+                // 驗證並匯入配方
+                data.recipes.forEach(r => {
+                    if (validateRecipe(r) && !recipes.find(existing => existing.id === r.id)) {
+                        recipes.push(r);
+                    }
+                });
+                saveRecipes();
+                renderMyRecipes();
+            }
+
+            if (data.journal && Array.isArray(data.journal)) {
+                // 驗證並匯入日誌
+                data.journal.forEach(j => {
+                    if (validateJournalEntry(j) && !journal.find(existing => existing.id === j.id)) {
+                        journal.push(j);
+                    }
+                });
+                saveJournal();
+                renderJournal();
+            }
+
+            if (data.inventory && Array.isArray(data.inventory)) {
+                coffeeInventory = data.inventory;
+                saveInventory();
+                renderInventory();
+            }
+
+            if (data.achievements && Array.isArray(data.achievements)) {
+                unlockedAchievements = [...new Set([...unlockedAchievements, ...data.achievements])];
+                saveAchievements();
+                renderAchievements();
+            }
+
+            updateStats();
+            showToast('資料已匯入');
+        } catch (error) {
+            showToast('匯入失敗：檔案格式錯誤');
+        }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+}
+
+// ========================================
+// 初始化新功能
+// ========================================
+function initNewFeatures() {
+    initThemeToggle();
+    initFlavorWheel();
+    initInventory();
+    initExtractionCalculator();
+    initRecipeCompare();
+    initStats();
+    initAchievements();
+    initExportImport();
+}
+
+// 在原有 init 函數後調用
+document.addEventListener('DOMContentLoaded', initNewFeatures);
