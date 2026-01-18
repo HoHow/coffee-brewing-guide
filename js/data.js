@@ -2668,3 +2668,489 @@ const BREW_GUIDES = {
         ]
     }
 };
+
+// ========================================
+// 咖啡風味輪資料 (基於 SCA 風味輪)
+// ========================================
+const FLAVOR_WHEEL = {
+    // 第一層：主要風味類別
+    categories: [
+        {
+            id: 'fruity',
+            name: '水果調',
+            color: '#FF6B6B',
+            icon: '🍎',
+            description: '咖啡中展現的水果風味，從柑橘類的明亮酸質到熱帶水果的甜美，是淺焙精品咖啡的重要特徵。',
+            subcategories: [
+                {
+                    id: 'berry',
+                    name: '莓果類',
+                    color: '#C0392B',
+                    flavors: [
+                        { id: 'strawberry', name: '草莓', description: '甜美、多汁的草莓香氣，常見於衣索比亞日曬豆', intensity: 'medium', origin: ['ethiopia-sidamo', 'ethiopia-guji'] },
+                        { id: 'blueberry', name: '藍莓', description: '濃郁的藍莓果醬風味，衣索比亞哈拉產區的標誌性風味', intensity: 'high', origin: ['ethiopia-harrar', 'ethiopia-guji'] },
+                        { id: 'raspberry', name: '覆盆子', description: '帶有輕微酸甜的覆盆子風味，清新活潑', intensity: 'medium', origin: ['kenya-aa', 'rwanda'] },
+                        { id: 'blackberry', name: '黑莓', description: '深色莓果的濃郁香甜，帶有些許野性', intensity: 'high', origin: ['ethiopia-harrar', 'kenya-aa'] },
+                        { id: 'cranberry', name: '蔓越莓', description: '酸甜平衡的蔓越莓風味，帶有輕微澀感', intensity: 'medium', origin: ['kenya-ab', 'tanzania'] },
+                        { id: 'cherry', name: '櫻桃', description: '甜美的櫻桃風味，是許多精品咖啡的常見描述', intensity: 'medium', origin: ['ethiopia-yirgacheffe', 'burundi'] }
+                    ]
+                },
+                {
+                    id: 'citrus',
+                    name: '柑橘類',
+                    color: '#F39C12',
+                    flavors: [
+                        { id: 'lemon', name: '檸檬', description: '明亮的檸檬酸質，清新爽口，常見於水洗處理的淺焙豆', intensity: 'high', origin: ['ethiopia-yirgacheffe', 'kenya-aa'] },
+                        { id: 'orange', name: '柳橙', description: '甜美的柳橙風味，酸甜平衡，親和力高', intensity: 'medium', origin: ['colombia-huila', 'costarica-tarrazu'] },
+                        { id: 'grapefruit', name: '葡萄柚', description: '帶有輕微苦味的葡萄柚風味，複雜而有層次', intensity: 'high', origin: ['kenya-aa', 'kenya-ab'] },
+                        { id: 'lime', name: '萊姆', description: '清新的萊姆酸質，活潑明亮', intensity: 'high', origin: ['ethiopia-yirgacheffe', 'panama-geisha'] },
+                        { id: 'tangerine', name: '橘子', description: '甜美的橘子香氣，比柳橙更甜', intensity: 'medium', origin: ['guatemala-huehue', 'honduras'] },
+                        { id: 'bergamot', name: '佛手柑', description: '複雜的佛手柑香氣，帶有茶感，藝伎咖啡的標誌風味', intensity: 'high', origin: ['panama-geisha', 'ethiopia-yirgacheffe'] }
+                    ]
+                },
+                {
+                    id: 'tropical',
+                    name: '熱帶水果',
+                    color: '#E67E22',
+                    flavors: [
+                        { id: 'mango', name: '芒果', description: '甜美多汁的芒果風味，常見於蜜處理咖啡', intensity: 'high', origin: ['ethiopia-guji', 'colombia-narino'] },
+                        { id: 'pineapple', name: '鳳梨', description: '酸甜的鳳梨風味，帶有熱帶氣息', intensity: 'high', origin: ['panama-geisha', 'ethiopia-guji'] },
+                        { id: 'passionfruit', name: '百香果', description: '濃郁的百香果香氣，酸度明顯，層次豐富', intensity: 'high', origin: ['kenya-aa', 'ethiopia-sidamo'] },
+                        { id: 'papaya', name: '木瓜', description: '柔和的木瓜甜感，帶有奶油質地', intensity: 'medium', origin: ['hawaii-kona', 'png'] },
+                        { id: 'lychee', name: '荔枝', description: '甜美芬芳的荔枝風味，細緻優雅', intensity: 'medium', origin: ['panama-geisha', 'ethiopia-yirgacheffe'] },
+                        { id: 'guava', name: '芭樂', description: '清新的芭樂風味，帶有獨特的香氣', intensity: 'medium', origin: ['taiwan-alishan', 'honduras'] }
+                    ]
+                },
+                {
+                    id: 'stone-fruit',
+                    name: '核果類',
+                    color: '#E74C3C',
+                    flavors: [
+                        { id: 'peach', name: '水蜜桃', description: '甜美多汁的水蜜桃風味，細緻優雅', intensity: 'medium', origin: ['ethiopia-guji', 'costarica-tarrazu'] },
+                        { id: 'apricot', name: '杏桃', description: '溫和的杏桃甜香，帶有些許酸質', intensity: 'medium', origin: ['costarica-tarrazu', 'guatemala-antigua'] },
+                        { id: 'plum', name: '李子', description: '深色李子的濃郁風味，帶有輕微酒感', intensity: 'high', origin: ['ethiopia-harrar', 'yemen'] },
+                        { id: 'nectarine', name: '油桃', description: '類似水蜜桃但更清爽的風味', intensity: 'medium', origin: ['ethiopia-sidamo', 'rwanda'] }
+                    ]
+                },
+                {
+                    id: 'dried-fruit',
+                    name: '果乾類',
+                    color: '#8E44AD',
+                    flavors: [
+                        { id: 'raisin', name: '葡萄乾', description: '濃縮的葡萄乾甜感，常見於深焙或陳年咖啡', intensity: 'high', origin: ['yemen', 'ethiopia-harrar'] },
+                        { id: 'date', name: '椰棗', description: '濃郁的椰棗甜感，帶有焦糖調性', intensity: 'high', origin: ['yemen', 'indonesia-sumatra'] },
+                        { id: 'fig', name: '無花果', description: '柔和的無花果甜香，層次豐富', intensity: 'medium', origin: ['yemen', 'ethiopia-harrar'] },
+                        { id: 'prune', name: '西梅乾', description: '深沉的西梅乾風味，帶有些許酒感', intensity: 'high', origin: ['ethiopia-harrar', 'yemen'] }
+                    ]
+                }
+            ]
+        },
+        {
+            id: 'floral',
+            name: '花香調',
+            color: '#9B59B6',
+            icon: '🌸',
+            description: '咖啡中細緻優雅的花香，從茉莉花的清新到玫瑰的濃郁，是高品質淺焙咖啡的重要指標。',
+            subcategories: [
+                {
+                    id: 'white-flower',
+                    name: '白花類',
+                    color: '#E8DAEF',
+                    flavors: [
+                        { id: 'jasmine', name: '茉莉花', description: '清新優雅的茉莉花香，藝伎咖啡的標誌性風味', intensity: 'high', origin: ['panama-geisha', 'ethiopia-yirgacheffe'] },
+                        { id: 'honeysuckle', name: '金銀花', description: '甜美的金銀花香氣，帶有蜂蜜調性', intensity: 'medium', origin: ['ethiopia-sidamo', 'rwanda'] },
+                        { id: 'orange-blossom', name: '橙花', description: '細緻的橙花香氣，清新甜美', intensity: 'medium', origin: ['colombia-narino', 'guatemala-huehue'] },
+                        { id: 'chamomile', name: '洋甘菊', description: '溫和的洋甘菊香氣，帶有草本調性', intensity: 'low', origin: ['ethiopia-yirgacheffe', 'kenya-ab'] }
+                    ]
+                },
+                {
+                    id: 'rose-family',
+                    name: '玫瑰類',
+                    color: '#FADBD8',
+                    flavors: [
+                        { id: 'rose', name: '玫瑰', description: '濃郁的玫瑰花香，優雅浪漫', intensity: 'high', origin: ['ethiopia-yirgacheffe', 'panama-geisha'] },
+                        { id: 'hibiscus', name: '洛神花', description: '酸甜的洛神花風味，帶有莓果調性', intensity: 'medium', origin: ['ethiopia-guji', 'kenya-aa'] },
+                        { id: 'peony', name: '牡丹', description: '豐富的牡丹花香，層次複雜', intensity: 'medium', origin: ['panama-geisha', 'ethiopia-yirgacheffe'] }
+                    ]
+                },
+                {
+                    id: 'other-flower',
+                    name: '其他花香',
+                    color: '#D7BDE2',
+                    flavors: [
+                        { id: 'lavender', name: '薰衣草', description: '淡雅的薰衣草香氣，帶有草本調性', intensity: 'low', origin: ['ethiopia-sidamo', 'rwanda'] },
+                        { id: 'violet', name: '紫羅蘭', description: '細緻的紫羅蘭花香，優雅含蓄', intensity: 'low', origin: ['ethiopia-yirgacheffe', 'colombia-narino'] },
+                        { id: 'elderflower', name: '接骨木花', description: '清新的接骨木花香，帶有麝香調性', intensity: 'medium', origin: ['panama-geisha', 'ethiopia-yirgacheffe'] },
+                        { id: 'gardenia', name: '梔子花', description: '濃郁的梔子花香，甜美芬芳', intensity: 'medium', origin: ['ethiopia-sidamo', 'rwanda'] }
+                    ]
+                }
+            ]
+        },
+        {
+            id: 'sweet',
+            name: '甜香調',
+            color: '#F1C40F',
+            icon: '🍯',
+            description: '咖啡中的甜感風味，從蜂蜜的天然甜到焦糖的烘焙甜，是平衡咖啡風味的重要元素。',
+            subcategories: [
+                {
+                    id: 'sugar',
+                    name: '糖類',
+                    color: '#FCF3CF',
+                    flavors: [
+                        { id: 'honey', name: '蜂蜜', description: '天然的蜂蜜甜感，溫潤柔和', intensity: 'medium', origin: ['guatemala-huehue', 'costarica-tarrazu'] },
+                        { id: 'brown-sugar', name: '紅糖', description: '溫暖的紅糖風味，帶有糖蜜調性', intensity: 'medium', origin: ['colombia-huila', 'brazil-santos'] },
+                        { id: 'maple-syrup', name: '楓糖', description: '濃郁的楓糖風味，甜美溫暖', intensity: 'high', origin: ['guatemala-antigua', 'honduras'] },
+                        { id: 'molasses', name: '糖蜜', description: '深沉的糖蜜風味，帶有些許苦甜', intensity: 'high', origin: ['brazil-cerrado', 'indonesia-java'] },
+                        { id: 'cane-sugar', name: '蔗糖', description: '純淨的蔗糖甜感，清爽不膩', intensity: 'medium', origin: ['colombia-narino', 'costarica-westvalley'] }
+                    ]
+                },
+                {
+                    id: 'caramelized',
+                    name: '焦糖類',
+                    color: '#D4AC0D',
+                    flavors: [
+                        { id: 'caramel', name: '焦糖', description: '經典的焦糖風味，甜美溫暖', intensity: 'high', origin: ['guatemala-antigua', 'colombia-huila'] },
+                        { id: 'toffee', name: '太妃糖', description: '濃郁的太妃糖風味，帶有奶油調性', intensity: 'high', origin: ['guatemala-huehue', 'elsalvador'] },
+                        { id: 'butterscotch', name: '奶油糖', description: '奶油糖的甜美風味，滑順可口', intensity: 'medium', origin: ['brazil-mogiana', 'colombia-huila'] },
+                        { id: 'burnt-sugar', name: '焦糖化', description: '深度焦糖化的風味，帶有輕微苦甜', intensity: 'high', origin: ['brazil-cerrado', 'indonesia-java'] }
+                    ]
+                },
+                {
+                    id: 'vanilla',
+                    name: '香草類',
+                    color: '#F9E79F',
+                    flavors: [
+                        { id: 'vanilla', name: '香草', description: '溫和的香草風味，甜美優雅', intensity: 'medium', origin: ['hawaii-kona', 'jamaica-bluemountain'] },
+                        { id: 'cream', name: '奶油', description: '滑順的奶油質地，豐富醇厚', intensity: 'medium', origin: ['brazil-santos', 'hawaii-kona'] },
+                        { id: 'butter', name: '奶油香', description: '濃郁的奶油香氣，口感滑順', intensity: 'medium', origin: ['guatemala-antigua', 'elsalvador'] }
+                    ]
+                }
+            ]
+        },
+        {
+            id: 'nutty',
+            name: '堅果調',
+            color: '#A0522D',
+            icon: '🥜',
+            description: '咖啡中的堅果風味，從杏仁的細緻到核桃的濃郁，是中焙咖啡的典型特徵。',
+            subcategories: [
+                {
+                    id: 'tree-nut',
+                    name: '樹堅果',
+                    color: '#D2B48C',
+                    flavors: [
+                        { id: 'almond', name: '杏仁', description: '細緻的杏仁風味，帶有輕微甜感', intensity: 'medium', origin: ['brazil-santos', 'colombia-huila'] },
+                        { id: 'hazelnut', name: '榛果', description: '濃郁的榛果風味，甜美可口', intensity: 'high', origin: ['guatemala-antigua', 'honduras'] },
+                        { id: 'walnut', name: '核桃', description: '深沉的核桃風味，帶有輕微苦味', intensity: 'medium', origin: ['brazil-cerrado', 'indonesia-sumatra'] },
+                        { id: 'pecan', name: '胡桃', description: '甜美的胡桃風味，帶有奶油調性', intensity: 'medium', origin: ['guatemala-huehue', 'honduras'] },
+                        { id: 'macadamia', name: '夏威夷果', description: '滑順的夏威夷果風味，奶油質地', intensity: 'medium', origin: ['hawaii-kona', 'png'] },
+                        { id: 'cashew', name: '腰果', description: '柔和的腰果風味，甜美滑順', intensity: 'low', origin: ['brazil-mogiana', 'india-malabar'] }
+                    ]
+                },
+                {
+                    id: 'legume',
+                    name: '豆類堅果',
+                    color: '#C4A484',
+                    flavors: [
+                        { id: 'peanut', name: '花生', description: '熟悉的花生風味，帶有烘烤調性', intensity: 'medium', origin: ['brazil-santos', 'indonesia-java'] },
+                        { id: 'roasted-peanut', name: '烤花生', description: '深度烘烤的花生風味，香氣濃郁', intensity: 'high', origin: ['brazil-cerrado', 'vietnam'] }
+                    ]
+                }
+            ]
+        },
+        {
+            id: 'chocolate',
+            name: '巧克力調',
+            color: '#5D3A1A',
+            icon: '🍫',
+            description: '咖啡中的可可風味，從牛奶巧克力的甜美到黑巧克力的深沉，是許多咖啡愛好者的最愛。',
+            subcategories: [
+                {
+                    id: 'chocolate-type',
+                    name: '巧克力類型',
+                    color: '#7B3F00',
+                    flavors: [
+                        { id: 'milk-chocolate', name: '牛奶巧克力', description: '甜美的牛奶巧克力風味，親和力高', intensity: 'medium', origin: ['colombia-huila', 'brazil-santos'] },
+                        { id: 'dark-chocolate', name: '黑巧克力', description: '深沉的黑巧克力風味，帶有苦甜', intensity: 'high', origin: ['guatemala-antigua', 'indonesia-java'] },
+                        { id: 'cocoa', name: '可可', description: '純粹的可可風味，帶有輕微苦味', intensity: 'high', origin: ['brazil-cerrado', 'indonesia-sumatra'] },
+                        { id: 'cocoa-nibs', name: '可可碎粒', description: '生可可的風味，帶有些許果酸', intensity: 'medium', origin: ['ethiopia-harrar', 'yemen'] },
+                        { id: 'white-chocolate', name: '白巧克力', description: '甜美的白巧克力風味，奶油質地', intensity: 'low', origin: ['hawaii-kona', 'jamaica-bluemountain'] }
+                    ]
+                },
+                {
+                    id: 'chocolate-notes',
+                    name: '巧克力調性',
+                    color: '#6F4E37',
+                    flavors: [
+                        { id: 'bittersweet', name: '苦甜巧克力', description: '苦甜平衡的巧克力風味', intensity: 'high', origin: ['guatemala-antigua', 'elsalvador'] },
+                        { id: 'chocolate-fudge', name: '巧克力軟糖', description: '濃郁甜美的巧克力軟糖風味', intensity: 'high', origin: ['brazil-mogiana', 'colombia-huila'] },
+                        { id: 'mocha', name: '摩卡', description: '巧克力與咖啡的經典組合風味', intensity: 'medium', origin: ['yemen', 'ethiopia-harrar'] }
+                    ]
+                }
+            ]
+        },
+        {
+            id: 'spicy',
+            name: '香料調',
+            color: '#E67E22',
+            icon: '🌶️',
+            description: '咖啡中的香料風味，從肉桂的溫暖到胡椒的刺激，增添咖啡的複雜度。',
+            subcategories: [
+                {
+                    id: 'warm-spice',
+                    name: '溫暖香料',
+                    color: '#D35400',
+                    flavors: [
+                        { id: 'cinnamon', name: '肉桂', description: '溫暖的肉桂風味，甜美芳香', intensity: 'medium', origin: ['guatemala-antigua', 'indonesia-java'] },
+                        { id: 'nutmeg', name: '肉荳蔻', description: '溫暖的肉荳蔻風味，帶有甜感', intensity: 'medium', origin: ['indonesia-sumatra', 'india-malabar'] },
+                        { id: 'clove', name: '丁香', description: '濃郁的丁香風味，帶有些許麻感', intensity: 'high', origin: ['indonesia-sulawesi', 'india-mysore'] },
+                        { id: 'allspice', name: '多香果', description: '複合香料風味，溫暖豐富', intensity: 'medium', origin: ['jamaica-bluemountain', 'guatemala-antigua'] },
+                        { id: 'cardamom', name: '小荳蔻', description: '清新的小荳蔻風味，帶有薄荷調性', intensity: 'medium', origin: ['guatemala-huehue', 'ethiopia-harrar'] }
+                    ]
+                },
+                {
+                    id: 'pungent-spice',
+                    name: '辛辣香料',
+                    color: '#CB4335',
+                    flavors: [
+                        { id: 'black-pepper', name: '黑胡椒', description: '辛辣的黑胡椒風味，刺激味蕾', intensity: 'high', origin: ['indonesia-sumatra', 'india-malabar'] },
+                        { id: 'ginger', name: '薑', description: '溫暖的薑風味，帶有辛辣感', intensity: 'medium', origin: ['indonesia-java', 'kenya-aa'] },
+                        { id: 'white-pepper', name: '白胡椒', description: '較溫和的胡椒風味', intensity: 'medium', origin: ['indonesia-sulawesi', 'vietnam'] }
+                    ]
+                },
+                {
+                    id: 'aromatic-spice',
+                    name: '芳香香料',
+                    color: '#AF601A',
+                    flavors: [
+                        { id: 'star-anise', name: '八角', description: '獨特的八角香氣，甜美芳香', intensity: 'medium', origin: ['vietnam', 'china-yunnan'] },
+                        { id: 'licorice', name: '甘草', description: '甘草的甜美風味，帶有藥草調性', intensity: 'medium', origin: ['indonesia-sumatra', 'india-mysore'] },
+                        { id: 'anise', name: '茴香', description: '清新的茴香風味，帶有甜感', intensity: 'low', origin: ['ethiopia-harrar', 'yemen'] }
+                    ]
+                }
+            ]
+        },
+        {
+            id: 'herbal',
+            name: '草本調',
+            color: '#27AE60',
+            icon: '🌿',
+            description: '咖啡中的草本風味，從茶感的細緻到草藥的複雜，展現咖啡的自然面向。',
+            subcategories: [
+                {
+                    id: 'tea-like',
+                    name: '茶感',
+                    color: '#58D68D',
+                    flavors: [
+                        { id: 'black-tea', name: '紅茶', description: '優雅的紅茶風味，帶有單寧感', intensity: 'medium', origin: ['ethiopia-yirgacheffe', 'panama-geisha'] },
+                        { id: 'green-tea', name: '綠茶', description: '清新的綠茶風味，帶有草本調性', intensity: 'low', origin: ['taiwan-alishan', 'china-yunnan'] },
+                        { id: 'earl-grey', name: '伯爵茶', description: '佛手柑調性的伯爵茶風味', intensity: 'medium', origin: ['panama-geisha', 'ethiopia-yirgacheffe'] },
+                        { id: 'oolong', name: '烏龍茶', description: '烏龍茶的花香與茶韻', intensity: 'medium', origin: ['taiwan-alishan', 'taiwan-nantou'] }
+                    ]
+                },
+                {
+                    id: 'herb',
+                    name: '藥草',
+                    color: '#2ECC71',
+                    flavors: [
+                        { id: 'mint', name: '薄荷', description: '清涼的薄荷風味，清新爽口', intensity: 'low', origin: ['ethiopia-yirgacheffe', 'rwanda'] },
+                        { id: 'basil', name: '羅勒', description: '清新的羅勒香氣，帶有甜感', intensity: 'low', origin: ['ethiopia-sidamo', 'kenya-ab'] },
+                        { id: 'thyme', name: '百里香', description: '溫和的百里香風味', intensity: 'low', origin: ['ethiopia-yirgacheffe', 'rwanda'] },
+                        { id: 'sage', name: '鼠尾草', description: '複雜的鼠尾草風味，帶有土質調性', intensity: 'medium', origin: ['indonesia-sumatra', 'india-malabar'] }
+                    ]
+                },
+                {
+                    id: 'vegetal',
+                    name: '蔬菜調',
+                    color: '#1E8449',
+                    flavors: [
+                        { id: 'celery', name: '芹菜', description: '清新的芹菜風味（可能是瑕疵）', intensity: 'low', origin: [] },
+                        { id: 'tomato', name: '番茄', description: '番茄的酸甜風味，肯亞咖啡的特色', intensity: 'medium', origin: ['kenya-aa', 'kenya-ab'] },
+                        { id: 'green-pepper', name: '青椒', description: '青椒的風味（可能是未熟豆）', intensity: 'low', origin: [] }
+                    ]
+                }
+            ]
+        },
+        {
+            id: 'earthy',
+            name: '土質調',
+            color: '#795548',
+            icon: '🌍',
+            description: '咖啡中的土質風味，從泥土的濕潤到煙燻的濃烈，常見於亞洲產區的咖啡。',
+            subcategories: [
+                {
+                    id: 'earth',
+                    name: '泥土類',
+                    color: '#8D6E63',
+                    flavors: [
+                        { id: 'earth', name: '泥土', description: '濕潤泥土的風味，印尼咖啡的標誌', intensity: 'high', origin: ['indonesia-sumatra', 'indonesia-sulawesi'] },
+                        { id: 'forest-floor', name: '森林地表', description: '落葉腐植土的風味，複雜深沉', intensity: 'high', origin: ['indonesia-sumatra', 'indonesia-gayo'] },
+                        { id: 'mushroom', name: '菇類', description: '菇類的土質風味，帶有鮮味', intensity: 'medium', origin: ['indonesia-sulawesi', 'india-malabar'] },
+                        { id: 'moss', name: '苔蘚', description: '濕潤苔蘚的風味', intensity: 'low', origin: ['indonesia-sumatra', 'png'] }
+                    ]
+                },
+                {
+                    id: 'woody',
+                    name: '木質類',
+                    color: '#A1887F',
+                    flavors: [
+                        { id: 'cedar', name: '雪松', description: '清新的雪松木香', intensity: 'medium', origin: ['indonesia-java', 'india-mysore'] },
+                        { id: 'oak', name: '橡木', description: '溫暖的橡木風味，帶有香草調性', intensity: 'medium', origin: ['guatemala-antigua', 'indonesia-java'] },
+                        { id: 'sandalwood', name: '檀香', description: '芳香的檀香木風味', intensity: 'medium', origin: ['india-mysore', 'indonesia-sulawesi'] },
+                        { id: 'pine', name: '松木', description: '清新的松木香氣', intensity: 'low', origin: ['ethiopia-harrar', 'yemen'] }
+                    ]
+                },
+                {
+                    id: 'smoky',
+                    name: '煙燻類',
+                    color: '#5D4037',
+                    flavors: [
+                        { id: 'smoke', name: '煙燻', description: '煙燻的風味，可能來自烘焙或處理法', intensity: 'high', origin: ['indonesia-java', 'india-malabar'] },
+                        { id: 'tobacco', name: '菸草', description: '熟成菸草的風味，複雜深沉', intensity: 'high', origin: ['indonesia-sumatra', 'cuba'] },
+                        { id: 'leather', name: '皮革', description: '皮革的風味，帶有土質調性', intensity: 'medium', origin: ['indonesia-sulawesi', 'yemen'] },
+                        { id: 'ash', name: '灰燼', description: '灰燼的風味（可能是過度烘焙）', intensity: 'high', origin: [] }
+                    ]
+                }
+            ]
+        },
+        {
+            id: 'fermented',
+            name: '發酵調',
+            color: '#8E44AD',
+            icon: '🍷',
+            description: '咖啡中的發酵風味，從紅酒的優雅到威士忌的濃烈，特殊處理法的咖啡常見此風味。',
+            subcategories: [
+                {
+                    id: 'wine',
+                    name: '酒類',
+                    color: '#9B59B6',
+                    flavors: [
+                        { id: 'red-wine', name: '紅酒', description: '紅酒的優雅風味，帶有單寧感', intensity: 'high', origin: ['ethiopia-harrar', 'yemen'] },
+                        { id: 'white-wine', name: '白酒', description: '清新的白酒風味，帶有果香', intensity: 'medium', origin: ['ethiopia-yirgacheffe', 'kenya-aa'] },
+                        { id: 'whiskey', name: '威士忌', description: '威士忌的濃郁風味，帶有橡木調性', intensity: 'high', origin: ['indonesia-java', 'india-monsooned'] },
+                        { id: 'brandy', name: '白蘭地', description: '白蘭地的果香與酒感', intensity: 'high', origin: ['yemen', 'ethiopia-harrar'] },
+                        { id: 'rum', name: '蘭姆酒', description: '蘭姆酒的甜美與濃郁', intensity: 'high', origin: ['jamaica-bluemountain', 'haiti'] }
+                    ]
+                },
+                {
+                    id: 'ferment-notes',
+                    name: '發酵調性',
+                    color: '#7D3C98',
+                    flavors: [
+                        { id: 'yeast', name: '酵母', description: '酵母發酵的風味', intensity: 'medium', origin: ['ethiopia-guji', 'colombia-narino'] },
+                        { id: 'vinegar', name: '醋酸', description: '醋酸的風味（可能是過度發酵）', intensity: 'high', origin: [] },
+                        { id: 'kombucha', name: '康普茶', description: '康普茶的發酵風味', intensity: 'medium', origin: ['ethiopia-guji', 'panama-geisha'] },
+                        { id: 'sour', name: '發酵酸', description: '發酵產生的複雜酸質', intensity: 'high', origin: ['ethiopia-harrar', 'yemen'] }
+                    ]
+                }
+            ]
+        },
+        {
+            id: 'roast',
+            name: '烘焙調',
+            color: '#34495E',
+            icon: '🔥',
+            description: '來自烘焙過程的風味，從焦香的愉悅到碳化的苦味，與烘焙程度密切相關。',
+            subcategories: [
+                {
+                    id: 'roast-positive',
+                    name: '正向烘焙風味',
+                    color: '#5D6D7E',
+                    flavors: [
+                        { id: 'roasted', name: '烘焙香', description: '愉悅的烘焙香氣', intensity: 'medium', origin: [] },
+                        { id: 'toast', name: '吐司', description: '烤吐司的香氣，溫暖親切', intensity: 'medium', origin: ['brazil-santos', 'colombia-huila'] },
+                        { id: 'grain', name: '穀物', description: '烘焙穀物的風味', intensity: 'low', origin: ['brazil-mogiana', 'guatemala-antigua'] },
+                        { id: 'malt', name: '麥芽', description: '麥芽的甜香風味', intensity: 'medium', origin: ['brazil-cerrado', 'honduras'] }
+                    ]
+                },
+                {
+                    id: 'roast-negative',
+                    name: '過度烘焙風味',
+                    color: '#2C3E50',
+                    flavors: [
+                        { id: 'burnt', name: '焦味', description: '過度烘焙產生的焦味', intensity: 'high', origin: [] },
+                        { id: 'carbon', name: '碳化', description: '碳化的苦味（過度烘焙）', intensity: 'high', origin: [] },
+                        { id: 'rubber', name: '橡膠', description: '橡膠味（可能是瑕疵豆）', intensity: 'high', origin: [] },
+                        { id: 'tar', name: '柏油', description: '柏油的風味（嚴重過烘）', intensity: 'high', origin: [] }
+                    ]
+                }
+            ]
+        },
+        {
+            id: 'other',
+            name: '其他',
+            color: '#95A5A6',
+            icon: '✨',
+            description: '其他難以歸類的風味描述，包括質地、口感和獨特特徵。',
+            subcategories: [
+                {
+                    id: 'texture',
+                    name: '質地口感',
+                    color: '#BDC3C7',
+                    flavors: [
+                        { id: 'silky', name: '絲滑', description: '絲綢般滑順的口感', intensity: 'medium', origin: ['jamaica-bluemountain', 'hawaii-kona'] },
+                        { id: 'creamy', name: '奶油感', description: '豐富的奶油質地', intensity: 'medium', origin: ['brazil-santos', 'guatemala-antigua'] },
+                        { id: 'juicy', name: '多汁', description: '如水果般的多汁感', intensity: 'high', origin: ['kenya-aa', 'ethiopia-yirgacheffe'] },
+                        { id: 'syrupy', name: '糖漿感', description: '如糖漿般的稠密感', intensity: 'high', origin: ['ethiopia-guji', 'panama-geisha'] },
+                        { id: 'buttery', name: '奶油質地', description: '如奶油般的滑順', intensity: 'medium', origin: ['brazil-mogiana', 'hawaii-kona'] }
+                    ]
+                },
+                {
+                    id: 'unique',
+                    name: '獨特風味',
+                    color: '#7F8C8D',
+                    flavors: [
+                        { id: 'complex', name: '複雜', description: '多層次的複雜風味', intensity: 'high', origin: ['panama-geisha', 'ethiopia-yirgacheffe'] },
+                        { id: 'clean', name: '乾淨', description: '純淨無雜味的風味', intensity: 'medium', origin: ['costarica-tarrazu', 'colombia-narino'] },
+                        { id: 'bright', name: '明亮', description: '活潑明亮的風味', intensity: 'high', origin: ['kenya-aa', 'ethiopia-yirgacheffe'] },
+                        { id: 'balanced', name: '平衡', description: '各方面均衡的風味', intensity: 'medium', origin: ['jamaica-bluemountain', 'colombia-huila'] },
+                        { id: 'lingering', name: '餘韻悠長', description: '風味持久不散', intensity: 'high', origin: ['panama-geisha', 'yemen'] }
+                    ]
+                }
+            ]
+        }
+    ]
+};
+
+// ========================================
+// 成就系統資料
+// ========================================
+const ACHIEVEMENTS = {
+    brewing: [
+        { id: 'first-brew', name: '初次沖煮', description: '記錄你的第一杯咖啡', icon: '☕', condition: { type: 'journal_count', value: 1 }, points: 10 },
+        { id: 'brew-10', name: '沖煮新手', description: '累計記錄 10 杯咖啡', icon: '🥉', condition: { type: 'journal_count', value: 10 }, points: 50 },
+        { id: 'brew-50', name: '沖煮達人', description: '累計記錄 50 杯咖啡', icon: '🥈', condition: { type: 'journal_count', value: 50 }, points: 100 },
+        { id: 'brew-100', name: '沖煮大師', description: '累計記錄 100 杯咖啡', icon: '🥇', condition: { type: 'journal_count', value: 100 }, points: 200 },
+        { id: 'brew-streak-7', name: '連續沖煮一週', description: '連續 7 天都有沖煮記錄', icon: '🔥', condition: { type: 'streak', value: 7 }, points: 75 },
+        { id: 'brew-streak-30', name: '沖煮月達人', description: '連續 30 天都有沖煮記錄', icon: '💎', condition: { type: 'streak', value: 30 }, points: 300 }
+    ],
+    methods: [
+        { id: 'try-v60', name: 'V60 入門', description: '使用 V60 沖煮咖啡', icon: '🫖', condition: { type: 'method_used', value: 'v60' }, points: 15 },
+        { id: 'try-aeropress', name: '愛樂壓玩家', description: '使用愛樂壓沖煮咖啡', icon: '💨', condition: { type: 'method_used', value: 'aeropress' }, points: 15 },
+        { id: 'try-frenchpress', name: '法壓壺愛好者', description: '使用法壓壺沖煮咖啡', icon: '🍶', condition: { type: 'method_used', value: 'frenchpress' }, points: 15 },
+        { id: 'try-espresso', name: '義式達人', description: '使用義式濃縮機', icon: '🎯', condition: { type: 'method_used', value: 'espresso' }, points: 20 },
+        { id: 'try-coldbrew', name: '冷萃愛好者', description: '嘗試冷萃咖啡', icon: '🧊', condition: { type: 'method_used', value: 'coldbrew' }, points: 15 },
+        { id: 'method-master', name: '沖煮方式大師', description: '嘗試過所有 16 種沖煮方式', icon: '👑', condition: { type: 'all_methods' }, points: 500 }
+    ],
+    origins: [
+        { id: 'africa-explorer', name: '非洲探險家', description: '嘗試 5 個非洲產區的咖啡', icon: '🌍', condition: { type: 'origin_count', region: 'africa', value: 5 }, points: 50 },
+        { id: 'america-explorer', name: '美洲探險家', description: '嘗試 5 個美洲產區的咖啡', icon: '🌎', condition: { type: 'origin_count', region: 'america', value: 5 }, points: 50 },
+        { id: 'asia-explorer', name: '亞洲探險家', description: '嘗試 5 個亞洲產區的咖啡', icon: '🌏', condition: { type: 'origin_count', region: 'asia', value: 5 }, points: 50 },
+        { id: 'world-traveler', name: '世界旅行者', description: '嘗試過 20 個不同產區的咖啡', icon: '✈️', condition: { type: 'origin_total', value: 20 }, points: 200 }
+    ],
+    recipes: [
+        { id: 'first-recipe', name: '配方創作者', description: '儲存你的第一個配方', icon: '📝', condition: { type: 'recipe_count', value: 1 }, points: 10 },
+        { id: 'recipe-collector', name: '配方收藏家', description: '儲存 10 個配方', icon: '📚', condition: { type: 'recipe_count', value: 10 }, points: 75 },
+        { id: 'recipe-master', name: '配方大師', description: '儲存 25 個配方', icon: '🎓', condition: { type: 'recipe_count', value: 25 }, points: 150 }
+    ],
+    ratings: [
+        { id: 'five-star', name: '完美一杯', description: '給予一杯咖啡 5 星評價', icon: '⭐', condition: { type: 'rating', value: 5 }, points: 20 },
+        { id: 'critic', name: '咖啡評論家', description: '累計給予 20 次評價', icon: '📊', condition: { type: 'rating_count', value: 20 }, points: 50 }
+    ],
+    special: [
+        { id: 'early-bird', name: '早起的鳥', description: '在早上 6 點前記錄沖煮', icon: '🌅', condition: { type: 'time', before: 6 }, points: 25 },
+        { id: 'night-owl', name: '夜貓子', description: '在晚上 11 點後記錄沖煮', icon: '🦉', condition: { type: 'time', after: 23 }, points: 25 },
+        { id: 'weekend-barista', name: '週末咖啡師', description: '在週末連續兩天都有沖煮', icon: '🎉', condition: { type: 'weekend_streak' }, points: 30 }
+    ]
+};
