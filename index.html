@@ -697,20 +697,43 @@
 
                 <div class="card">
                     <h3 class="card-title">探索咖啡風味世界</h3>
-                    <p class="card-description">點擊風味類別，深入了解每種風味的特徵與常見產區</p>
+                    <p class="card-description">點擊風味類別探索，再點擊具體風味查看詳細介紹</p>
+
+                    <!-- 風味輪視覺化 -->
+                    <div id="flavorWheelVisual" class="flavor-wheel-visual">
+                        <!-- 由 JS 動態生成 SVG 風味輪 -->
+                    </div>
 
                     <!-- 風味類別選擇 -->
                     <div id="flavorCategoryList" class="flavor-category-list">
                         <!-- 由 JS 動態生成 -->
                     </div>
 
-                    <!-- 風味詳情面板 -->
-                    <div id="flavorDetailPanel" class="flavor-detail-panel" style="display: none;">
-                        <h4 id="flavorCategoryTitle" class="flavor-category-detail-title"></h4>
-                        <p id="flavorCategoryDesc" class="flavor-category-desc"></p>
-                        <div id="flavorSubcategories">
+                    <!-- 風味詳情面板 - 直接在下方展開 -->
+                    <div id="flavorDetailPanel" class="flavor-detail-panel-inline" style="display: none;">
+                        <div class="flavor-detail-header">
+                            <div class="flavor-detail-icon" id="flavorDetailIcon"></div>
+                            <div class="flavor-detail-info">
+                                <h4 id="flavorCategoryTitle" class="flavor-category-detail-title"></h4>
+                                <p id="flavorCategoryDesc" class="flavor-category-desc"></p>
+                            </div>
+                        </div>
+                        <div id="flavorSubcategories" class="flavor-subcategories-grid">
                             <!-- 由 JS 動態生成 -->
                         </div>
+                    </div>
+
+                    <!-- 單個風味詳情 - 點擊風味時展開 -->
+                    <div id="singleFlavorDetail" class="single-flavor-detail" style="display: none;">
+                        <div class="single-flavor-content">
+                            <div class="single-flavor-header">
+                                <span class="single-flavor-name" id="singleFlavorName"></span>
+                                <span class="single-flavor-intensity" id="singleFlavorIntensity"></span>
+                            </div>
+                            <p class="single-flavor-desc" id="singleFlavorDesc"></p>
+                            <div class="single-flavor-origins" id="singleFlavorOrigins"></div>
+                        </div>
+                        <button class="single-flavor-close" id="closeSingleFlavor">✕</button>
                     </div>
                 </div>
             </div>

@@ -1566,13 +1566,18 @@ function initFlavorWheel() {
     if (typeof FLAVOR_WHEEL === 'undefined') return;
 
     const categoryList = document.getElementById('flavorCategoryList');
-    const detailPanel = document.getElementById('flavorDetailPanel');
+    const wheelVisual = document.getElementById('flavorWheelVisual');
 
     if (!categoryList) return;
 
-    // 渲染風味類別
+    // 生成 SVG 風味輪視覺化
+    if (wheelVisual) {
+        renderFlavorWheelSVG(wheelVisual);
+    }
+
+    // 渲染風味類別按鈕
     categoryList.innerHTML = FLAVOR_WHEEL.categories.map(cat => `
-        <div class="flavor-category-item" data-category="${escapeHtml(cat.id)}" style="background-color: ${escapeHtml(cat.color)}20;">
+        <div class="flavor-category-item" data-category="${escapeHtml(cat.id)}" style="background-color: ${escapeHtml(cat.color)}20; border-color: ${escapeHtml(cat.color)};">
             <div class="flavor-category-icon">${escapeHtml(cat.icon)}</div>
             <div class="flavor-category-name">${escapeHtml(cat.name)}</div>
         </div>
@@ -1587,6 +1592,99 @@ function initFlavorWheel() {
             // 更新 active 狀態
             categoryList.querySelectorAll('.flavor-category-item').forEach(i => i.classList.remove('active'));
             item.classList.add('active');
+
+            // 隱藏單個風味詳情
+            const singleDetail = document.getElementById('singleFlavorDetail');
+            if (singleDetail) singleDetail.style.display = 'none';
+        });
+    });
+
+    // 關閉單個風味詳情的按鈕
+    const closeBtn = document.getElementById('closeSingleFlavor');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            document.getElementById('singleFlavorDetail').style.display = 'none';
+        });
+    }
+}
+
+// 生成 SVG 風味輪視覺化
+function renderFlavorWheelSVG(container) {
+    const categories = FLAVOR_WHEEL.categories;
+    const size = 320;
+    const center = size / 2;
+    const outerRadius = 140;
+    const innerRadius = 50;
+    const anglePerCategory = (2 * Math.PI) / categories.length;
+
+    let svgContent = `
+        <svg viewBox="0 0 ${size} ${size}" class="flavor-wheel-svg">
+            <defs>
+                <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.15"/>
+                </filter>
+            </defs>
+            <!-- 中心圓 -->
+            <circle cx="${center}" cy="${center}" r="${innerRadius - 5}" fill="#F5E6D3" stroke="#8B4513" stroke-width="2"/>
+            <text x="${center}" y="${center}" text-anchor="middle" dominant-baseline="middle"
+                  font-size="12" fill="#5D4037" font-weight="bold">咖啡風味</text>
+    `;
+
+    categories.forEach((cat, index) => {
+        const startAngle = index * anglePerCategory - Math.PI / 2;
+        const endAngle = (index + 1) * anglePerCategory - Math.PI / 2;
+        const midAngle = (startAngle + endAngle) / 2;
+
+        // 計算扇形路徑
+        const x1 = center + innerRadius * Math.cos(startAngle);
+        const y1 = center + innerRadius * Math.sin(startAngle);
+        const x2 = center + outerRadius * Math.cos(startAngle);
+        const y2 = center + outerRadius * Math.sin(startAngle);
+        const x3 = center + outerRadius * Math.cos(endAngle);
+        const y3 = center + outerRadius * Math.sin(endAngle);
+        const x4 = center + innerRadius * Math.cos(endAngle);
+        const y4 = center + innerRadius * Math.sin(endAngle);
+
+        // 圖示位置
+        const iconRadius = (innerRadius + outerRadius) / 2;
+        const iconX = center + iconRadius * Math.cos(midAngle);
+        const iconY = center + iconRadius * Math.sin(midAngle);
+
+        svgContent += `
+            <path d="M ${x1} ${y1} L ${x2} ${y2} A ${outerRadius} ${outerRadius} 0 0 1 ${x3} ${y3} L ${x4} ${y4} A ${innerRadius} ${innerRadius} 0 0 0 ${x1} ${y1}"
+                  fill="${cat.color}40" stroke="${cat.color}" stroke-width="2"
+                  class="wheel-segment" data-category="${cat.id}"
+                  style="cursor: pointer; transition: all 0.3s ease;"/>
+            <text x="${iconX}" y="${iconY}" text-anchor="middle" dominant-baseline="middle"
+                  font-size="20" style="pointer-events: none;">${cat.icon}</text>
+        `;
+    });
+
+    svgContent += '</svg>';
+    container.innerHTML = svgContent;
+
+    // 綁定 SVG 扇形點擊事件
+    container.querySelectorAll('.wheel-segment').forEach(segment => {
+        segment.addEventListener('click', () => {
+            const categoryId = segment.dataset.category;
+            showFlavorCategory(categoryId);
+
+            // 同步更新類別按鈕的 active 狀態
+            const categoryList = document.getElementById('flavorCategoryList');
+            categoryList.querySelectorAll('.flavor-category-item').forEach(i => {
+                i.classList.toggle('active', i.dataset.category === categoryId);
+            });
+        });
+
+        // 懸停效果
+        segment.addEventListener('mouseenter', () => {
+            segment.style.opacity = '0.8';
+            segment.style.transform = 'scale(1.02)';
+            segment.style.transformOrigin = 'center';
+        });
+        segment.addEventListener('mouseleave', () => {
+            segment.style.opacity = '1';
+            segment.style.transform = 'scale(1)';
         });
     });
 }
@@ -1596,11 +1694,18 @@ function showFlavorCategory(categoryId) {
     if (!category) return;
 
     const detailPanel = document.getElementById('flavorDetailPanel');
+    const iconEl = document.getElementById('flavorDetailIcon');
     const titleEl = document.getElementById('flavorCategoryTitle');
     const descEl = document.getElementById('flavorCategoryDesc');
     const subcatEl = document.getElementById('flavorSubcategories');
 
-    titleEl.innerHTML = `${escapeHtml(category.icon)} ${escapeHtml(category.name)}`;
+    // 更新圖示
+    if (iconEl) {
+        iconEl.textContent = category.icon;
+        iconEl.style.backgroundColor = category.color + '30';
+    }
+
+    titleEl.innerHTML = `${escapeHtml(category.name)}`;
     descEl.textContent = category.description;
 
     // 渲染子類別和風味
@@ -1611,6 +1716,7 @@ function showFlavorCategory(categoryId) {
                 ${sub.flavors.map(flavor => `
                     <span class="flavor-item"
                           data-flavor='${JSON.stringify(flavor).replace(/'/g, "&#39;")}'
+                          data-subcolor="${escapeHtml(sub.color)}"
                           style="border-color: ${escapeHtml(sub.color)};">
                         ${escapeHtml(flavor.name)}
                     </span>
@@ -1619,12 +1725,17 @@ function showFlavorCategory(categoryId) {
         </div>
     `).join('');
 
-    // 風味項目點擊事件
+    // 風味項目點擊事件 - 直接在下方顯示詳情
     subcatEl.querySelectorAll('.flavor-item').forEach(item => {
-        item.addEventListener('click', () => {
+        item.addEventListener('click', (e) => {
             try {
                 const flavor = JSON.parse(item.dataset.flavor);
-                showFlavorInfo(flavor, category);
+                const subcolor = item.dataset.subcolor;
+                showFlavorInfo(flavor, category, subcolor, item);
+
+                // 更新選中狀態
+                subcatEl.querySelectorAll('.flavor-item').forEach(i => i.classList.remove('selected'));
+                item.classList.add('selected');
             } catch (e) {
                 console.error('解析風味資料失敗');
             }
@@ -1632,38 +1743,49 @@ function showFlavorCategory(categoryId) {
     });
 
     detailPanel.style.display = 'block';
+
+    // 滾動到詳情面板
+    detailPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
-function showFlavorInfo(flavor, category) {
-    const modal = document.getElementById('flavorInfoModal');
-    const iconEl = document.getElementById('flavorInfoIcon');
-    const nameEl = document.getElementById('flavorInfoName');
-    const descEl = document.getElementById('flavorInfoDesc');
-    const intensityEl = document.getElementById('flavorInfoIntensity');
-    const originsEl = document.getElementById('flavorInfoOrigins');
+// 直接在下方顯示風味詳情（不使用彈出視窗）
+function showFlavorInfo(flavor, category, subcolor, clickedItem) {
+    const detailEl = document.getElementById('singleFlavorDetail');
+    const nameEl = document.getElementById('singleFlavorName');
+    const intensityEl = document.getElementById('singleFlavorIntensity');
+    const descEl = document.getElementById('singleFlavorDesc');
+    const originsEl = document.getElementById('singleFlavorOrigins');
 
-    iconEl.style.backgroundColor = category.color + '30';
-    iconEl.textContent = category.icon;
+    if (!detailEl) return;
+
+    // 設定內容
     nameEl.textContent = flavor.name;
-    descEl.textContent = flavor.description;
+    nameEl.style.color = subcolor || category.color;
 
     const intensityLabels = { low: '輕微', medium: '中等', high: '明顯' };
-    intensityEl.innerHTML = `<strong>強度：</strong>${intensityLabels[flavor.intensity] || flavor.intensity}`;
+    const intensityColors = { low: '#81C784', medium: '#FFB74D', high: '#E57373' };
+    intensityEl.textContent = intensityLabels[flavor.intensity] || flavor.intensity;
+    intensityEl.style.backgroundColor = intensityColors[flavor.intensity] || '#FFB74D';
+
+    descEl.textContent = flavor.description;
 
     if (flavor.origin && flavor.origin.length > 0) {
         originsEl.innerHTML = `
-            <strong>常見產區：</strong><br>
-            ${flavor.origin.map(o => `<span class="flavor-origin-tag">${escapeHtml(o)}</span>`).join('')}
+            <span class="origins-label">常見產區：</span>
+            ${flavor.origin.map(o => `<span class="flavor-origin-tag" style="border-color: ${subcolor || category.color};">${escapeHtml(o)}</span>`).join('')}
         `;
     } else {
         originsEl.innerHTML = '';
     }
 
-    modal.classList.add('active');
+    // 設定邊框顏色
+    detailEl.style.borderColor = subcolor || category.color;
 
-    document.getElementById('closeFlavorInfo').onclick = () => {
-        modal.classList.remove('active');
-    };
+    // 顯示詳情
+    detailEl.style.display = 'block';
+
+    // 確保詳情面板在可見範圍內（不需要滾動）
+    detailEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
 // ========================================
